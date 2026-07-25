@@ -13,7 +13,10 @@ from problemfinder.domain.source_policy import (
     RobotsStatus,
     SourcePolicy,
 )
-from problemfinder.sources.adapters.fos_decisions.discover import discover_decisions
+from problemfinder.sources.adapters.fos_decisions.discover import (
+    decision_window,
+    discover_decisions,
+)
 from problemfinder.sources.adapters.fos_decisions.normalise import to_signal
 from problemfinder.sources.adapters.fos_decisions.parser import parse_decision
 from problemfinder.sources.fetch import fetch_one
@@ -49,7 +52,7 @@ class FosDecisionsSource:
     )
 
     def discover(self, cursor: Cursor | None) -> AsyncIterator[WorkItem]:
-        return discover_decisions(self.key, self.policy)
+        return discover_decisions(self.key, self.policy, decision_window(self.key))
 
     async def fetch(self, item: WorkItem) -> RawDocument:
         return await fetch_one(self.key, self.policy, item, default_media_type="application/pdf")

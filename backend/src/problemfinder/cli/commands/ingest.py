@@ -5,7 +5,8 @@ from typing import Annotated
 
 import typer
 
-from problemfinder.ingestion import config, pipeline
+from problemfinder.ingestion import pipeline
+from problemfinder.sources import config
 from problemfinder.sources.registry import all_sources
 
 app = typer.Typer(no_args_is_help=True)

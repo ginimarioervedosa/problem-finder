@@ -4,8 +4,8 @@ from fastapi import APIRouter
 
 from problemfinder.api.dependencies import SessionDep
 from problemfinder.api.responses import SourceInfo
-from problemfinder.ingestion.config import enabled_sources
 from problemfinder.persistence.repositories.ingestion_runs import latest_for_source
+from problemfinder.sources.config import enabled_sources
 from problemfinder.sources.registry import all_sources
 
 router = APIRouter(prefix="/api/sources", tags=["sources"])

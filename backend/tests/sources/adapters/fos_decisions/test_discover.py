@@ -1,6 +1,7 @@
 """Discovery: card extraction, base-tag URL resolution, and pagination."""
 
 from collections.abc import Generator
+from datetime import date
 from pathlib import Path
 
 import httpx
@@ -38,8 +39,11 @@ def fos_search() -> Generator[respx.MockRouter]:
         yield router
 
 
+WINDOW = (date(2025, 1, 1), date(2025, 6, 30))
+
+
 async def collect(router: respx.MockRouter) -> list[WorkItem]:
-    return [item async for item in discover_decisions("fos_decisions_test", FAST_POLICY)]
+    return [item async for item in discover_decisions("fos_decisions_test", FAST_POLICY, WINDOW)]
 
 
 async def test_yields_one_item_per_card_until_the_search_runs_dry(

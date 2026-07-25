@@ -1,8 +1,9 @@
 # One entry per source. Adding a data source means one new adapter package
 # under sources/adapters/ plus one entry here; nothing else changes.
 #
-# `schedule` is a cron expression consumed by the worker (phase 3); until then
-# it is documentation of intent.
+# `schedule` is a cron expression consumed by `pf serve worker`. An optional
+# `options` table per source is passed verbatim to that source's adapter;
+# the core never interprets it.
 
 [sources.fos_complaints]
 enabled = true
@@ -11,3 +12,7 @@ schedule = "0 7 * * 1"
 [sources.fos_decisions]
 enabled = true
 schedule = "0 7 * * 2"
+
+[sources.fos_decisions.options]
+window_from = 2025-01-01
+window_to = 2025-06-30
