@@ -36,7 +36,7 @@ twice.
 The layering contract (enforced by import-linter and eslint-plugin-boundaries):
 
 ```
-cli, worker -> api -> queries, ingestion -> sources, persistence, enrichment -> domain
+cli, worker -> api -> queries, ingestion, enrichment -> sources, persistence -> domain
 ```
 
 ## Add a data source in under five minutes
@@ -102,9 +102,12 @@ its package. The `.claude/skills/new-source-adapter` skill automates this scaffo
 The UI at `localhost:5173` gives ranked volumes by category, filterable by free-text
 search (Postgres full-text over titles and bodies, with phrase and `-exclusion`
 syntax), firm, category, kind and period, with drill-through to each signal's
-provenance (archived payload hash, ingestion run, link to the original). The Trends
-view draws monthly volumes as lines per category, firm, or source; the Runs view
-shows the ingestion ledger (counts, durations, errors) for every pipeline execution.
+provenance (archived payload hash, ingestion run, link to the original). The Themes
+view ranks derived problem themes with a volume-weighted versus severity-weighted
+toggle, cross-source corroboration counts and half-year trend, and clicking a theme
+drills into the signals that produced it. The Trends view draws monthly volumes as
+lines per category, firm, or source; the Runs view shows the ingestion ledger
+(counts, durations, errors) for every pipeline execution.
 Notebooks can connect read-only to `postgresql://pf:pf@localhost:5432/problemfinder`.
 
 ## Keeping data fresh
@@ -136,3 +139,20 @@ cd backend && uv run pf reparse fos_complaints
 
 Signal identities are stable (UUIDv5 of source and external id), so regenerated
 signals overwrite in place.
+
+## Deriving themes and severity
+
+Derived attributes (theme, severity, monetary amount, wealth segment, resolution)
+are opinions layered over the stored facts, never part of ingestion. Deterministic
+rule passes compute them; the theme taxonomy is configuration in
+`backend/config/taxonomy.yaml`, so categorisation opinions can change without
+touching code:
+
+```bash
+cd backend && uv run pf enrich run              # enrich signals that have none yet
+cd backend && uv run pf enrich run --recompute  # rebuild every derived attribute
+```
+
+Recompute appends a new version per signal and only where the derived attributes
+actually changed, so running it twice writes nothing the second time. Every row
+records the method that produced it (`rules:v1`) alongside its version.

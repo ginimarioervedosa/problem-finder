@@ -16,7 +16,7 @@ ease of adding new data sources, never for scale.
 | `backend/src/problemfinder/sources/` | Source protocol, registry, shared HTTP client; one adapter package per source under `adapters/`. |
 | `backend/src/problemfinder/persistence/` | ORM rows, domain mapping, repositories, Alembic migrations. |
 | `backend/src/problemfinder/ingestion/` | Source-agnostic pipeline: compliance gate, write-once archive, dedupe-on-store. |
-| `backend/src/problemfinder/enrichment/` | Pluggable derived-attribute passes (phases 4 and 5). |
+| `backend/src/problemfinder/enrichment/` | Derived attributes: pure rule passes, the taxonomy loader, the versioned runner. |
 | `backend/src/problemfinder/queries/` | Read services backing the API. |
 | `backend/src/problemfinder/api/` | Thin FastAPI routers. No business logic. |
 | `backend/src/problemfinder/cli/` | Typer CLI (`pf`); every operation runs from here. |
@@ -62,10 +62,14 @@ Dependencies point inwards only. Enforced by import-linter (backend) and
 eslint-plugin-boundaries (frontend); the TOML source of truth is in `backend/pyproject.toml`.
 
 ```
-cli, worker  ->  api  ->  queries, ingestion  ->  sources, persistence, enrichment  ->  domain
+cli, worker  ->  api  ->  queries, ingestion, enrichment  ->  sources, persistence  ->  domain
 ```
 
-- Modules on the same tier are mutually independent (sources never import persistence).
+- Modules on the same tier are mutually independent (sources never import persistence,
+  and ingestion never imports enrichment: raw collection cannot depend on opinions).
+- Enrichment's runner (`enrichment/run.py`) orchestrates persistence like ingestion
+  does, but the rules themselves (`passes/`, `taxonomy.py`, `ruleset.py`, `derive.py`)
+  are pure over domain models; a dedicated import-linter contract enforces it.
 - `domain` imports nothing but the standard library and pydantic.
 - `httpx`, `selectolax`, and Playwright exist only inside `sources/`; the rest of the
   codebase never knows how a source is fetched.
@@ -100,6 +104,8 @@ cli, worker  ->  api  ->  queries, ingestion  ->  sources, persistence, enrichme
 | `cd backend && uv run pf ingest list` | Show registered sources, method, enablement |
 | `cd backend && uv run pf ingest run <key> --full` | Ingest ignoring the saved cursor for one run |
 | `cd backend && uv run pf reparse <key>` | Replay a source's archive through parse + normalise, no refetch |
+| `cd backend && uv run pf enrich run` | Compute derived attributes for signals that have none |
+| `cd backend && uv run pf enrich run --recompute` | Rebuild every derived attribute (idempotent; writes only changes) |
 | `cd backend && uv run pf serve worker` | Cron-scheduled ingests from sources.toml, one run at a time |
 | `cd backend && uv run pf db revision -m "..."` | Autogenerate a migration |
 
