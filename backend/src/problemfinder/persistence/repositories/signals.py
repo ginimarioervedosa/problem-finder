@@ -7,14 +7,15 @@ one payload repeating an external id must never crash a write or inflate the
 stored count, whichever path it arrives through.
 """
 
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 from itertools import batched
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
-from problemfinder.persistence.mapping import AnySignal, signal_to_values
+from problemfinder.persistence.mapping import AnySignal, row_to_signal, signal_to_values
 from problemfinder.persistence.orm import SignalRow
 
 _CHUNK = 500
@@ -29,6 +30,25 @@ def _first_per_id(signals: Sequence[AnySignal]) -> list[AnySignal]:
             seen.add(signal.id)
             unique.append(signal)
     return unique
+
+
+def stream_all(session: Session, chunk_size: int = _CHUNK) -> Iterator[list[AnySignal]]:
+    """Every stored signal as a domain model, in id-ordered chunks.
+
+    Keyset pagination rather than one long-lived cursor, so callers can write
+    through the same session between chunks and rows committed mid-iteration
+    (a live crawl, say) are picked up rather than skipped.
+    """
+    last: UUID | None = None
+    while True:
+        stmt = select(SignalRow).order_by(SignalRow.id).limit(chunk_size)
+        if last is not None:
+            stmt = stmt.where(SignalRow.id > last)
+        rows = session.execute(stmt).scalars().all()
+        if not rows:
+            return
+        last = rows[-1].id
+        yield [row_to_signal(row) for row in rows]
 
 
 def upsert_many(session: Session, signals: Sequence[AnySignal]) -> tuple[int, int]:

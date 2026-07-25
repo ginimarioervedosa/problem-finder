@@ -89,6 +89,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/themes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ranked */
+        get: operations["ranked_api_themes_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/trends/{dimension}": {
         parameters: {
             query?: never;
@@ -275,6 +292,23 @@ export interface components {
             ingestion_run_id: string;
             /** Raw Payload Sha256 */
             raw_payload_sha256: string;
+        };
+        /** RankedTheme */
+        RankedTheme: {
+            /** Corroborating Sources */
+            corroborating_sources: number;
+            /** Previous Volume */
+            previous_volume: number;
+            /** Recent Volume */
+            recent_volume: number;
+            /** Severity Weighted */
+            severity_weighted: number;
+            /** Signals */
+            signals: number;
+            /** Theme */
+            theme: string;
+            /** Volume */
+            volume: number;
         };
         /**
          * RateLimit
@@ -499,6 +533,7 @@ export interface operations {
                 period_from?: string | null;
                 period_to?: string | null;
                 search?: string | null;
+                theme?: string | null;
             };
             header?: never;
             path?: never;
@@ -588,6 +623,7 @@ export interface operations {
                 period_from?: string | null;
                 period_to?: string | null;
                 search?: string | null;
+                theme?: string | null;
             };
             header?: never;
             path: {
@@ -617,6 +653,45 @@ export interface operations {
             };
         };
     };
+    ranked_api_themes_get: {
+        parameters: {
+            query?: {
+                top?: number;
+                source_key?: string | null;
+                kind?: components["schemas"]["SignalKind"] | null;
+                firm?: string | null;
+                category?: string | null;
+                period_from?: string | null;
+                period_to?: string | null;
+                search?: string | null;
+                theme?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RankedTheme"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     trend_api_trends__dimension__get: {
         parameters: {
             query?: {
@@ -628,6 +703,7 @@ export interface operations {
                 period_from?: string | null;
                 period_to?: string | null;
                 search?: string | null;
+                theme?: string | null;
             };
             header?: never;
             path: {

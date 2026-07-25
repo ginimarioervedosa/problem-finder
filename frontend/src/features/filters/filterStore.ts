@@ -10,10 +10,12 @@ interface FilterState {
   firm: string;
   category: string | null;
   kind: SignalKind | null;
+  theme: string | null;
   setSearch: (search: string) => void;
   setFirm: (firm: string) => void;
   setCategory: (category: string | null) => void;
   setKind: (kind: SignalKind | null) => void;
+  setTheme: (theme: string | null) => void;
   reset: () => void;
 }
 
@@ -22,6 +24,7 @@ export const useFilterStore = create<FilterState>()((set) => ({
   firm: "",
   category: null,
   kind: null,
+  theme: null,
   setSearch: (search) => {
     set({ search });
   },
@@ -34,7 +37,10 @@ export const useFilterStore = create<FilterState>()((set) => ({
   setKind: (kind) => {
     set({ kind });
   },
+  setTheme: (theme) => {
+    set({ theme });
+  },
   reset: () => {
-    set({ search: "", firm: "", category: null, kind: null });
+    set({ search: "", firm: "", category: null, kind: null, theme: null });
   },
 }));

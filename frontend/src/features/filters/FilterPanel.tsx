@@ -1,5 +1,7 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { formatThemeLabel } from "@/lib/format";
 
 import { useFilterStore } from "./filterStore";
 
@@ -13,8 +15,8 @@ const selectClass =
   "h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
 export function FilterPanel({ categories }: { categories: string[] }) {
-  const { search, firm, category, kind, setSearch, setFirm, setCategory, setKind, reset } =
-    useFilterStore();
+  const { search, firm, category, kind, theme, ...actions } = useFilterStore();
+  const { setSearch, setFirm, setCategory, setKind, setTheme, reset } = actions;
   return (
     <div className="flex flex-wrap items-center gap-3">
       <Input
@@ -65,6 +67,21 @@ export function FilterPanel({ categories }: { categories: string[] }) {
           </option>
         ))}
       </select>
+      {theme !== null && (
+        <Badge variant="secondary" className="gap-1">
+          Theme: {formatThemeLabel(theme)}
+          <button
+            type="button"
+            aria-label="Clear theme filter"
+            className="cursor-pointer font-semibold"
+            onClick={() => {
+              setTheme(null);
+            }}
+          >
+            ×
+          </button>
+        </Badge>
+      )}
       <Button variant="ghost" size="sm" onClick={reset}>
         Reset
       </Button>

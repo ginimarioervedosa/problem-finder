@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from problemfinder.domain.signal import SignalKind
 from problemfinder.persistence.mapping import AnySignal, row_to_signal
 from problemfinder.persistence.orm import SignalRow
+from problemfinder.persistence.repositories.signal_enrichments import latest_rows
 
 
 class SignalFilters(BaseModel):
@@ -21,6 +22,7 @@ class SignalFilters(BaseModel):
     period_from: date | None = None
     period_to: date | None = None
     search: str | None = None
+    theme: str | None = None  # matches each signal's latest enrichment
 
 
 def effective_date() -> ColumnElement[date]:
@@ -47,6 +49,10 @@ def apply_filters(
         # websearch syntax: quoted phrases, OR, and -exclusions all work.
         query = func.websearch_to_tsquery("english", filters.search)
         stmt = stmt.where(SignalRow.search_tsv.bool_op("@@")(query))
+    if filters.theme:
+        latest = latest_rows().subquery()
+        themed = select(latest.c.signal_id).where(latest.c.theme == filters.theme)
+        stmt = stmt.where(SignalRow.id.in_(themed))
     return stmt
 
 
