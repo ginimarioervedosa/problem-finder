@@ -1,48 +1,20 @@
 """The discriminated signal union and the deterministic identity scheme."""
 
-from datetime import UTC, date, datetime
+from datetime import datetime
 from uuid import uuid4
 
 import pytest
 from pydantic import TypeAdapter, ValidationError
 
 from problemfinder.domain.identity import content_fingerprint, signal_id_for
-from problemfinder.domain.provenance import Provenance
 from problemfinder.domain.signal import AggregateSignal, ProblemSignal, VerbatimSignal
+from tests.support.builders import build_aggregate, build_provenance
 
 SIGNAL_ADAPTER: TypeAdapter[VerbatimSignal | AggregateSignal] = TypeAdapter(ProblemSignal)
 
 
-def make_provenance() -> Provenance:
-    return Provenance(
-        raw_payload_sha256="a" * 64,
-        adapter_version=1,
-        ingestion_run_id=uuid4(),
-        fetched_at=datetime(2026, 7, 1, tzinfo=UTC),
-    )
-
-
-def make_aggregate(**overrides: object) -> AggregateSignal:
-    payload: dict[str, object] = {
-        "id": signal_id_for("fos_complaints", "h1-2025:firm:banking"),
-        "source_key": "fos_complaints",
-        "external_id": "h1-2025:firm:banking",
-        "url": "https://example.org/data",
-        "published_at": None,
-        "retrieved_at": datetime(2026, 7, 1, tzinfo=UTC),
-        "title": "Firm - banking complaints",
-        "body": "Firm received 42 banking complaints.",
-        "period_start": date(2025, 1, 1),
-        "period_end": date(2025, 6, 30),
-        "volume": 42,
-        "provenance": make_provenance(),
-    }
-    payload.update(overrides)
-    return AggregateSignal.model_validate(payload)
-
-
 def test_discriminator_round_trips_aggregate() -> None:
-    signal = make_aggregate()
+    signal = build_aggregate()
     parsed = SIGNAL_ADAPTER.validate_json(signal.model_dump_json())
     assert isinstance(parsed, AggregateSignal)
     assert parsed == signal
@@ -61,7 +33,7 @@ def test_discriminator_selects_verbatim_from_plain_dict() -> None:
             "title": None,
             "body": "My private bank lost my transfer.",
             "author_handle": "some_user",
-            "provenance": make_provenance().model_dump(),
+            "provenance": build_provenance().model_dump(),
         }
     )
     assert isinstance(parsed, VerbatimSignal)
@@ -69,19 +41,19 @@ def test_discriminator_selects_verbatim_from_plain_dict() -> None:
 
 
 def test_signals_are_immutable() -> None:
-    signal = make_aggregate()
+    signal = build_aggregate()
     with pytest.raises(ValidationError):
         signal.body = "rewritten"  # type: ignore[misc]
 
 
 def test_upheld_share_must_be_a_share() -> None:
     with pytest.raises(ValidationError):
-        make_aggregate(upheld_share=1.5)
+        build_aggregate(upheld_share=1.5)
 
 
 def test_naive_datetimes_are_rejected() -> None:
     with pytest.raises(ValidationError):
-        make_aggregate(retrieved_at=datetime(2026, 7, 1))
+        build_aggregate(retrieved_at=datetime(2026, 7, 1))
 
 
 def test_identity_is_deterministic_and_distinct() -> None:

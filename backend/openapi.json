@@ -1,0 +1,1126 @@
+{
+  "components": {
+    "schemas": {
+      "AggregateSignal": {
+        "description": "A published statistic covering an observation window.",
+        "properties": {
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "denominator": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Denominator"
+          },
+          "external_id": {
+            "title": "External Id",
+            "type": "string"
+          },
+          "extras": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extras",
+            "type": "object"
+          },
+          "firm_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Firm Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "const": "aggregate",
+            "default": "aggregate",
+            "title": "Kind",
+            "type": "string"
+          },
+          "language": {
+            "default": "en",
+            "title": "Language",
+            "type": "string"
+          },
+          "period_end": {
+            "format": "date",
+            "title": "Period End",
+            "type": "string"
+          },
+          "period_start": {
+            "format": "date",
+            "title": "Period Start",
+            "type": "string"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/Provenance"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "retrieved_at": {
+            "format": "date-time",
+            "title": "Retrieved At",
+            "type": "string"
+          },
+          "source_key": {
+            "title": "Source Key",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "upheld_share": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upheld Share"
+          },
+          "url": {
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Url",
+            "type": "string"
+          },
+          "volume": {
+            "minimum": 0.0,
+            "title": "Volume",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "source_key",
+          "external_id",
+          "url",
+          "published_at",
+          "retrieved_at",
+          "title",
+          "body",
+          "provenance",
+          "period_start",
+          "period_end",
+          "volume"
+        ],
+        "title": "AggregateSignal",
+        "type": "object"
+      },
+      "Cursor": {
+        "description": "Opaque to everything except the adapter that owns it.\n\nThe pipeline stores and replays `state` verbatim; only the adapter whose\n`source_key` matches interprets its contents.",
+        "properties": {
+          "source_key": {
+            "title": "Source Key",
+            "type": "string"
+          },
+          "state": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "State",
+            "type": "object"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_key",
+          "updated_at"
+        ],
+        "title": "Cursor",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "IngestionMethod": {
+        "enum": [
+          "official_api",
+          "bulk_download",
+          "scrape",
+          "manual_import"
+        ],
+        "title": "IngestionMethod",
+        "type": "string"
+      },
+      "IngestionRun": {
+        "description": "Counts and cursor movement for a single run of one source.",
+        "properties": {
+          "cursor_after": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Cursor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cursor_before": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Cursor"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "deduplicated": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Deduplicated",
+            "type": "integer"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "fetched": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Fetched",
+            "type": "integer"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "parsed": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Parsed",
+            "type": "integer"
+          },
+          "source_key": {
+            "title": "Source Key",
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "stored_new": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Stored New",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "source_key",
+          "started_at"
+        ],
+        "title": "IngestionRun",
+        "type": "object"
+      },
+      "JsonValue": {},
+      "Provenance": {
+        "description": "Every signal traces to an archived payload and the run that produced it.\n\nThe raw payload is stored write-once and content-addressed, so bumping an\nadapter's version and replaying the archive (`pf reparse`) can regenerate\nevery signal without refetching anything.",
+        "properties": {
+          "adapter_version": {
+            "title": "Adapter Version",
+            "type": "integer"
+          },
+          "fetched_at": {
+            "format": "date-time",
+            "title": "Fetched At",
+            "type": "string"
+          },
+          "ingestion_run_id": {
+            "format": "uuid",
+            "title": "Ingestion Run Id",
+            "type": "string"
+          },
+          "raw_payload_sha256": {
+            "title": "Raw Payload Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "raw_payload_sha256",
+          "adapter_version",
+          "ingestion_run_id",
+          "fetched_at"
+        ],
+        "title": "Provenance",
+        "type": "object"
+      },
+      "RateLimit": {
+        "description": "At most `requests` requests per `per_seconds` window.",
+        "properties": {
+          "burst": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Burst",
+            "type": "integer"
+          },
+          "per_seconds": {
+            "exclusiveMinimum": 0.0,
+            "title": "Per Seconds",
+            "type": "number"
+          },
+          "requests": {
+            "minimum": 1.0,
+            "title": "Requests",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "requests",
+          "per_seconds"
+        ],
+        "title": "RateLimit",
+        "type": "object"
+      },
+      "RobotsStatus": {
+        "enum": [
+          "allowed",
+          "disallowed",
+          "not_applicable"
+        ],
+        "title": "RobotsStatus",
+        "type": "string"
+      },
+      "SignalKind": {
+        "enum": [
+          "verbatim",
+          "aggregate"
+        ],
+        "title": "SignalKind",
+        "type": "string"
+      },
+      "SignalPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/VerbatimSignal"
+                },
+                {
+                  "$ref": "#/components/schemas/AggregateSignal"
+                }
+              ]
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "SignalPage",
+        "type": "object"
+      },
+      "SourceInfo": {
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "last_run": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IngestionRun"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "policy": {
+            "$ref": "#/components/schemas/SourcePolicy"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "version",
+          "enabled",
+          "policy",
+          "last_run"
+        ],
+        "title": "SourceInfo",
+        "type": "object"
+      },
+      "SourcePolicy": {
+        "description": "One per adapter: how this source may lawfully be collected.\n\n`terms_reviewed` is the date a human last read robots.txt and the site's\nterms; `terms_notes` records where they live and what they permit, so the\nreview is auditable without leaving the code.",
+        "properties": {
+          "method": {
+            "$ref": "#/components/schemas/IngestionMethod"
+          },
+          "rate_limit": {
+            "$ref": "#/components/schemas/RateLimit"
+          },
+          "requires_browser": {
+            "default": false,
+            "title": "Requires Browser",
+            "type": "boolean"
+          },
+          "robots_status": {
+            "$ref": "#/components/schemas/RobotsStatus"
+          },
+          "terms_notes": {
+            "title": "Terms Notes",
+            "type": "string"
+          },
+          "terms_reviewed": {
+            "format": "date",
+            "title": "Terms Reviewed",
+            "type": "string"
+          },
+          "user_agent": {
+            "title": "User Agent",
+            "type": "string"
+          }
+        },
+        "required": [
+          "method",
+          "robots_status",
+          "terms_reviewed",
+          "terms_notes",
+          "rate_limit",
+          "user_agent"
+        ],
+        "title": "SourcePolicy",
+        "type": "object"
+      },
+      "SummaryDimension": {
+        "enum": [
+          "category",
+          "firm",
+          "source"
+        ],
+        "title": "SummaryDimension",
+        "type": "string"
+      },
+      "SummaryRow": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "signals": {
+            "title": "Signals",
+            "type": "integer"
+          },
+          "upheld_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Upheld Share"
+          },
+          "volume": {
+            "title": "Volume",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "volume",
+          "signals",
+          "upheld_share"
+        ],
+        "title": "SummaryRow",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VerbatimSignal": {
+        "description": "One person's own words, unmodified.",
+        "properties": {
+          "author_handle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author Handle"
+          },
+          "body": {
+            "title": "Body",
+            "type": "string"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "external_id": {
+            "title": "External Id",
+            "type": "string"
+          },
+          "extras": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Extras",
+            "type": "object"
+          },
+          "firm_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Firm Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "const": "verbatim",
+            "default": "verbatim",
+            "title": "Kind",
+            "type": "string"
+          },
+          "language": {
+            "default": "en",
+            "title": "Language",
+            "type": "string"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/Provenance"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "retrieved_at": {
+            "format": "date-time",
+            "title": "Retrieved At",
+            "type": "string"
+          },
+          "source_key": {
+            "title": "Source Key",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "url": {
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source_key",
+          "external_id",
+          "url",
+          "published_at",
+          "retrieved_at",
+          "title",
+          "body",
+          "provenance"
+        ],
+        "title": "VerbatimSignal",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "problemfinder",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/signals": {
+      "get": {
+        "operationId": "list_signals_api_signals_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source_key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source Key"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SignalKind"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "firm",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Firm"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignalPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Signals",
+        "tags": [
+          "signals"
+        ]
+      }
+    },
+    "/api/signals/{signal_id}": {
+      "get": {
+        "operationId": "signal_detail_api_signals__signal_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "signal_id",
+            "required": true,
+            "schema": {
+              "title": "Signal Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/VerbatimSignal"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AggregateSignal"
+                    }
+                  ],
+                  "title": "Response Signal Detail Api Signals  Signal Id  Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Signal Detail",
+        "tags": [
+          "signals"
+        ]
+      }
+    },
+    "/api/sources": {
+      "get": {
+        "operationId": "list_sources_api_sources_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SourceInfo"
+                  },
+                  "title": "Response List Sources Api Sources Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Sources",
+        "tags": [
+          "sources"
+        ]
+      }
+    },
+    "/api/summaries/{dimension}": {
+      "get": {
+        "operationId": "summarise_api_summaries__dimension__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dimension",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SummaryDimension"
+            }
+          },
+          {
+            "in": "query",
+            "name": "top",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Top",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source_key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source Key"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SignalKind"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "firm",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Firm"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "period_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Period To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SummaryRow"
+                  },
+                  "title": "Response Summarise Api Summaries  Dimension  Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Summarise",
+        "tags": [
+          "summaries"
+        ]
+      }
+    }
+  }
+}
