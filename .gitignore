@@ -21,3 +21,6 @@ data/
 
 # OS
 .DS_Store
+
+# Session worktrees (linked checkouts, never tracked)
+.claude/worktrees/
