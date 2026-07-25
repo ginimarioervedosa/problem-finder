@@ -15,6 +15,7 @@ import httpx
 from pydantic import JsonValue
 from selectolax.parser import HTMLParser, Node
 
+from problemfinder.domain.cursor import Cursor
 from problemfinder.domain.source_policy import SourcePolicy
 from problemfinder.sources.config import source_options
 from problemfinder.sources.http import client_for
@@ -29,15 +30,31 @@ _DRN_RE = re.compile(r"DRN-\d+", re.IGNORECASE)
 _OUTCOMES = {"upheld", "not upheld"}
 
 
-def decision_window(source_key: str) -> tuple[date, date]:
-    """(from, to) out of the source's options; TOML dates arrive as `date`."""
+def decision_window(source_key: str, cursor: Cursor | None) -> tuple[date, date]:
+    """(from, to) out of the source's options, resumed from the cursor.
+
+    TOML dates arrive as `date`. A cursor narrows the start to the newest
+    decision date already seen; the same day is refetched and deduped rather
+    than risk missing decisions published later that day.
+    """
     options = source_options(source_key)
     window_from = options.get("window_from", _DEFAULT_WINDOW[0])
     window_to = options.get("window_to", _DEFAULT_WINDOW[1])
     if not isinstance(window_from, date) or not isinstance(window_to, date):
         msg = f"{source_key}: window_from/window_to must be TOML dates"
         raise TypeError(msg)
+    latest = latest_decision_date(cursor)
+    if latest is not None:
+        window_from = max(window_from, latest)
     return window_from, window_to
+
+
+def latest_decision_date(cursor: Cursor | None) -> date | None:
+    """The newest decision date folded into the cursor, if any."""
+    if cursor is None:
+        return None
+    state = cursor.state.get("latest_decision_date")
+    return date.fromisoformat(state) if isinstance(state, str) else None
 
 
 async def discover_decisions(

@@ -38,8 +38,10 @@ class StubSource:
     def __init__(self, item_ids: Sequence[str] = ("item-1",)) -> None:
         self._item_ids = list(item_ids)
         self.events: list[tuple[str, str]] = []
+        self.cursors_seen: list[Cursor | None] = []
 
     async def discover(self, cursor: Cursor | None) -> AsyncIterator[WorkItem]:
+        self.cursors_seen.append(cursor)
         for item_id in self._item_ids:
             self.events.append(("discover", item_id))
             yield WorkItem(external_id=item_id, url=f"https://example.org/{item_id}")

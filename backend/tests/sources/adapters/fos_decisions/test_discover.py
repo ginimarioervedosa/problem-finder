@@ -1,17 +1,20 @@
 """Discovery: card extraction, base-tag URL resolution, and pagination."""
 
 from collections.abc import Generator
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import httpx
 import pytest
 import respx
 
+from problemfinder.domain.cursor import Cursor
 from problemfinder.domain.source_policy import RateLimit
+from problemfinder.sources.adapters.fos_decisions import discover
 from problemfinder.sources.adapters.fos_decisions.adapter import FosDecisionsSource
 from problemfinder.sources.adapters.fos_decisions.discover import (
     SEARCH_URL,
+    decision_window,
     discover_decisions,
 )
 from problemfinder.sources.protocol import WorkItem
@@ -77,3 +80,24 @@ async def test_requests_stay_within_the_configured_window(fos_search: respx.Mock
     assert first.params["Sort"] == "date"
     second = httpx.URL(str(fos_search.calls[1].request.url))
     assert second.params["Start"] == "10"
+
+
+def make_cursor(latest: str | None) -> Cursor:
+    state = {"latest_decision_date": latest}
+    return Cursor(
+        source_key="fos_decisions", state=state, updated_at=datetime(2026, 7, 1, tzinfo=UTC)
+    )
+
+
+def test_window_resumes_from_the_cursor(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(discover, "source_options", lambda key: {})
+    resumed = decision_window("fos_decisions", make_cursor("2025-03-15"))
+    assert resumed == (date(2025, 3, 15), date(2025, 6, 30))
+
+
+def test_window_never_starts_before_the_configured_from(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(discover, "source_options", lambda key: {})
+    early = decision_window("fos_decisions", make_cursor("2024-11-01"))
+    assert early == (date(2025, 1, 1), date(2025, 6, 30))
+    assert decision_window("fos_decisions", None) == (date(2025, 1, 1), date(2025, 6, 30))
+    assert decision_window("fos_decisions", make_cursor(None))[0] == date(2025, 1, 1)

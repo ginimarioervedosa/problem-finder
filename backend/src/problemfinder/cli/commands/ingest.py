@@ -17,12 +17,13 @@ def run(
     source: Annotated[str, typer.Argument(help="source key, e.g. fos_complaints")],
     limit: Annotated[int | None, typer.Option(help="stop after N work items")] = None,
     force: Annotated[bool, typer.Option(help="run even if disabled in sources.toml")] = False,
+    full: Annotated[bool, typer.Option(help="ignore the saved cursor for this run")] = False,
 ) -> None:
     """Ingest one source end to end and print the run ledger."""
     if not force and not config.is_enabled(source):
         typer.echo(f"{source} is disabled in sources.toml (use --force to override)")
         raise typer.Exit(code=1)
-    record = asyncio.run(pipeline.run_source(source, limit=limit))
+    record = asyncio.run(pipeline.run_source(source, limit=limit, full=full))
     typer.echo(
         f"{source}: fetched {record.fetched} payload(s), parsed {record.parsed} signal(s), "
         f"stored {record.stored_new} new, skipped {record.deduplicated} duplicate(s)"

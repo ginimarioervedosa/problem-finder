@@ -10,7 +10,7 @@ from problemfinder.domain.identity import content_fingerprint
 from problemfinder.domain.ingestion_run import IngestionRun
 from problemfinder.domain.provenance import Provenance
 from problemfinder.domain.signal import AggregateSignal, SignalKind, VerbatimSignal
-from problemfinder.persistence.orm import IngestionRunRow, SignalRow
+from problemfinder.persistence.orm import CursorRow, IngestionRunRow, SignalRow
 
 type AnySignal = VerbatimSignal | AggregateSignal
 
@@ -90,6 +90,18 @@ def run_to_values(run: IngestionRun) -> dict[str, object]:
     )
     values["cursor_after"] = run.cursor_after.model_dump(mode="json") if run.cursor_after else None
     return values
+
+
+def cursor_to_values(cursor: Cursor) -> dict[str, object]:
+    values: dict[str, object] = cursor.model_dump(mode="json")
+    values["updated_at"] = cursor.updated_at  # DateTime column, not JSONB
+    return values
+
+
+def row_to_cursor(row: CursorRow) -> Cursor:
+    return Cursor.model_validate(
+        {"source_key": row.source_key, "state": row.state, "updated_at": row.updated_at}
+    )
 
 
 def row_to_run(row: IngestionRunRow) -> IngestionRun:

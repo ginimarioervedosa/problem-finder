@@ -15,24 +15,35 @@ from problemfinder.domain.ingestion_run import IngestionRun
 from problemfinder.domain.provenance import Provenance
 from problemfinder.ingestion import archive, compliance
 from problemfinder.persistence.engine import session_scope
-from problemfinder.persistence.repositories import ingestion_runs, raw_payloads, signals
+from problemfinder.persistence.repositories import cursors, ingestion_runs, raw_payloads, signals
 from problemfinder.sources import registry
 from problemfinder.sources.protocol import Source, WorkItem
 
 
-async def run_source(source_key: str, limit: int | None = None) -> IngestionRun:
-    """Ingest one source end to end and return the finished run record."""
+async def run_source(source_key: str, limit: int | None = None, full: bool = False) -> IngestionRun:
+    """Ingest one source end to end and return the finished run record.
+
+    Discovery resumes from the source's persisted cursor; `full` ignores it
+    for one run (the cursor is still refolded and saved afterwards).
+    """
     source = registry.get(source_key)
     compliance.check(source.policy)
 
-    run = IngestionRun(id=uuid4(), source_key=source.key, started_at=datetime.now(tz=UTC))
+    with session_scope() as session:
+        cursor = None if full else cursors.load(session, source.key)
+    run = IngestionRun(
+        id=uuid4(),
+        source_key=source.key,
+        started_at=datetime.now(tz=UTC),
+        cursor_before=cursor,
+    )
     with session_scope() as session:
         ingestion_runs.record(session, run)
 
     counts = {"fetched": 0, "parsed": 0, "stored_new": 0, "deduplicated": 0}
     errors: list[str] = []
     done: list[WorkItem] = []
-    async for item in source.discover(None):
+    async for item in source.discover(cursor):
         if limit is not None and len(done) >= limit:
             break
         try:
@@ -44,13 +55,15 @@ async def run_source(source_key: str, limit: int | None = None) -> IngestionRun:
     finished = run.model_copy(
         update={
             "finished_at": datetime.now(tz=UTC),
-            "cursor_after": source.cursor_after(None, done) if done else None,
+            "cursor_after": source.cursor_after(cursor, done) if done else None,
             "errors": errors,
             **counts,
         }
     )
     with session_scope() as session:
         ingestion_runs.record(session, finished)
+        if finished.cursor_after is not None:
+            cursors.save(session, finished.cursor_after)
     return finished
 
 

@@ -16,6 +16,7 @@ from problemfinder.domain.source_policy import (
 from problemfinder.sources.adapters.fos_decisions.discover import (
     decision_window,
     discover_decisions,
+    latest_decision_date,
 )
 from problemfinder.sources.adapters.fos_decisions.normalise import to_signal
 from problemfinder.sources.adapters.fos_decisions.parser import parse_decision
@@ -52,7 +53,7 @@ class FosDecisionsSource:
     )
 
     def discover(self, cursor: Cursor | None) -> AsyncIterator[WorkItem]:
-        return discover_decisions(self.key, self.policy, decision_window(self.key))
+        return discover_decisions(self.key, self.policy, decision_window(self.key, cursor))
 
     async def fetch(self, item: WorkItem) -> RawDocument:
         return await fetch_one(self.key, self.policy, item, default_media_type="application/pdf")
@@ -65,6 +66,8 @@ class FosDecisionsSource:
 
     def cursor_after(self, cursor: Cursor | None, done: Sequence[WorkItem]) -> Cursor:
         dates = [str(hint) for item in done if (hint := item.request_hints.get("decision_date"))]
+        if (previous := latest_decision_date(cursor)) is not None:
+            dates.append(previous.isoformat())
         return Cursor(
             source_key=self.key,
             state={"latest_decision_date": max(dates, default=None)},
