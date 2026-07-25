@@ -6,6 +6,7 @@ the behaviour lives once; a source needing more (a browser, an API envelope)
 implements its own fetch instead.
 """
 
+from collections.abc import Mapping
 from datetime import UTC, datetime
 
 from problemfinder.domain.source_policy import SourcePolicy
@@ -14,10 +15,14 @@ from problemfinder.sources.protocol import RawDocument, WorkItem
 
 
 async def fetch_one(
-    source_key: str, policy: SourcePolicy, item: WorkItem, default_media_type: str
+    source_key: str,
+    policy: SourcePolicy,
+    item: WorkItem,
+    default_media_type: str,
+    headers: Mapping[str, str] | None = None,
 ) -> RawDocument:
     async with client_for(source_key, policy) as client:
-        response = await client.get(str(item.url))
+        response = await client.get(str(item.url), headers=dict(headers or {}))
         response.raise_for_status()
         return RawDocument(
             work_item=item,
