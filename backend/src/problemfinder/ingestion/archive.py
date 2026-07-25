@@ -32,6 +32,8 @@ def store(raw: RawDocument, source_key: str, adapter_version: int) -> RawPayload
         sha256=sha256,
         source_key=source_key,
         url=str(raw.work_item.url),
+        external_id=raw.work_item.external_id,
+        request_hints=raw.work_item.request_hints,
         media_type=raw.media_type,
         size_bytes=len(raw.content),
         http_status=raw.http_status,
