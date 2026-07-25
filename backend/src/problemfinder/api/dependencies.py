@@ -25,6 +25,7 @@ def signal_filters(  # noqa: PLR0913, PLR0917 -- one parameter per query filter,
     period_from: date | None = None,
     period_to: date | None = None,
     search: str | None = None,
+    theme: str | None = None,
 ) -> SignalFilters:
     """The dashboard filter set, flattened into explicit query parameters."""
     return SignalFilters(
@@ -35,6 +36,7 @@ def signal_filters(  # noqa: PLR0913, PLR0917 -- one parameter per query filter,
         period_from=period_from,
         period_to=period_to,
         search=search,
+        theme=theme,
     )
 
 

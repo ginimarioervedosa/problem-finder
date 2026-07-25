@@ -14,6 +14,9 @@ function RootLayout() {
             <Link to="/signals" className="hover:text-neutral-900 [&.active]:font-medium [&.active]:text-neutral-900">
               Signals
             </Link>
+            <Link to="/themes" className="hover:text-neutral-900 [&.active]:font-medium [&.active]:text-neutral-900">
+              Themes
+            </Link>
             <Link to="/trends" className="hover:text-neutral-900 [&.active]:font-medium [&.active]:text-neutral-900">
               Trends
             </Link>

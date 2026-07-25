@@ -39,6 +39,11 @@ export function formatDuration(start: string, end: string | null | undefined): s
   return `${Math.floor(seconds / 60).toString()}m ${Math.round(seconds % 60).toString()}s`;
 }
 
+export function formatThemeLabel(key: string): string {
+  const words = key.replaceAll("_", " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 export function formatPeriod(start: string | null | undefined, end: string | null | undefined): string {
   if (!start || !end) {
     return "—";
