@@ -98,10 +98,18 @@ cli, worker  ->  api  ->  queries, ingestion  ->  sources, persistence, enrichme
 | `make check` | Every quality gate (backend, frontend, shared) |
 | `make test` | Test suites only |
 | `cd backend && uv run pf ingest list` | Show registered sources, method, enablement |
+| `cd backend && uv run pf ingest run <key> --full` | Ingest ignoring the saved cursor for one run |
 | `cd backend && uv run pf reparse <key>` | Replay a source's archive through parse + normalise, no refetch |
+| `cd backend && uv run pf serve worker` | Cron-scheduled ingests from sources.toml, one run at a time |
 | `cd backend && uv run pf db revision -m "..."` | Autogenerate a migration |
 
 Database tests need `make up` first; they fail loudly, never skip silently.
+
+Ingestion is incremental by default: each source's resume point lives in the
+`cursors` table and discovery starts from it. Per-source knobs (the fos_decisions
+date window, Reddit subreddits) live in an `options` table in `sources.toml`, read
+only by the owning adapter. Reddit needs `PF_REDDIT_CLIENT_ID` and
+`PF_REDDIT_CLIENT_SECRET` in `.env` and stays disabled until they exist.
 
 ## Behavioural Foundation
 

@@ -102,8 +102,28 @@ its package. The `.claude/skills/new-source-adapter` skill automates this scaffo
 The UI at `localhost:5173` gives ranked volumes by category, filterable by free-text
 search (Postgres full-text over titles and bodies, with phrase and `-exclusion`
 syntax), firm, category, kind and period, with drill-through to each signal's
-provenance (archived payload hash, ingestion run, link to the original). Notebooks
-can connect read-only to `postgresql://pf:pf@localhost:5432/problemfinder`.
+provenance (archived payload hash, ingestion run, link to the original). The Trends
+view draws monthly volumes as lines per category, firm, or source; the Runs view
+shows the ingestion ledger (counts, durations, errors) for every pipeline execution.
+Notebooks can connect read-only to `postgresql://pf:pf@localhost:5432/problemfinder`.
+
+## Keeping data fresh
+
+Ingestion is incremental: every source persists a resume cursor, so a rerun fetches
+only what is new (`--full` ignores the cursor for one run). Transient HTTP failures
+retry with exponential backoff inside the shared client. To run on a schedule:
+
+```bash
+cd backend && uv run pf serve worker   # cron expressions live in sources.toml
+```
+
+The worker shells the same `pf ingest run` command a human would use and runs one
+ingest at a time, so sources sharing a host never fetch concurrently.
+
+The Reddit source uses the official Data API and needs OAuth credentials in `.env`
+(`PF_REDDIT_CLIENT_ID`, `PF_REDDIT_CLIENT_SECRET`, from a script app created at
+reddit.com/prefs/apps); it stays disabled in `sources.toml` until they exist.
+Subreddits are configured there too.
 
 ## Reparsing history
 
