@@ -60,6 +60,8 @@ async def _process_item(
     raw = await source.fetch(item)
     counts["fetched"] += 1
     meta = archive.store(raw, source.key, source.version)
+    with session_scope() as session:
+        raw_payloads.add_if_absent(session, meta)
     provenance = Provenance(
         raw_payload_sha256=meta.sha256,
         adapter_version=source.version,
@@ -69,7 +71,6 @@ async def _process_item(
     normalised = [source.normalise(record, provenance) for record in source.parse(raw)]
     counts["parsed"] += len(normalised)
     with session_scope() as session:
-        raw_payloads.add_if_absent(session, meta)
         stored, skipped = signals.upsert_many(session, normalised)
     counts["stored_new"] += stored
     counts["deduplicated"] += skipped

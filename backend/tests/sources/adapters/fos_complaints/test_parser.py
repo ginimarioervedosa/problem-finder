@@ -80,3 +80,20 @@ def test_hints_flow_into_every_record(records: list[ParsedRecord]) -> None:
 def test_garbage_bytes_raise_only_parse_errors(content: bytes) -> None:
     with pytest.raises(SourceParseError):
         list(parse_workbook(make_raw(content)))
+
+
+LEGACY_FIXTURE = Path(__file__).parent / "fixtures" / "business-complaints-data-h1-2013.xlsx"
+
+
+def test_legacy_workbook_era_parses_with_positional_upheld_shares() -> None:
+    """2009-2020 files: 'New/Resolved complaints' sheets, three-row resolved header."""
+    records = list(parse_workbook(make_raw(LEGACY_FIXTURE.read_bytes())))
+    assert len(records) > 300
+    categories = {str(record.fields["category"]) for record in records}
+    assert "PPI" in categories  # separate category in the legacy era
+    with_upheld = [r for r in records if r.fields["upheld_share"] is not None]
+    assert len(with_upheld) > 100
+    assert all(
+        isinstance(r.fields["upheld_share"], float) and 0 <= r.fields["upheld_share"] <= 1
+        for r in with_upheld
+    )
