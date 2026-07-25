@@ -11,6 +11,10 @@ import httpx
 from problemfinder.domain.source_policy import SourcePolicy
 from problemfinder.sources.rate_limiter import TokenBucket
 
+IDENTIFYING_USER_AGENT = (
+    "problem-finder/0.1 (single-user research tool; contact: mario.ervedosa@thegini.co.uk)"
+)
+
 _buckets: dict[str, TokenBucket] = {}
 
 

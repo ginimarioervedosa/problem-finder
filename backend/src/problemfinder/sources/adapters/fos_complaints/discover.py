@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 import httpx
 from selectolax.parser import HTMLParser
 
+from problemfinder.sources.page_base import page_base
 from problemfinder.sources.protocol import WorkItem
 
 BASE = "https://www.financial-ombudsman.org.uk"
@@ -64,7 +65,7 @@ async def _index_file_items(client: httpx.AsyncClient) -> list[WorkItem]:
     response = await client.get(INDEX_URL)
     response.raise_for_status()
     tree = HTMLParser(response.text)
-    base_url = _page_base(tree, str(response.url))
+    base_url = page_base(tree, str(response.url))
     items: list[WorkItem] = []
     for node in tree.css("a[href]"):
         href = node.attributes.get("href") or ""
@@ -74,12 +75,6 @@ async def _index_file_items(client: httpx.AsyncClient) -> list[WorkItem]:
         half, year = f"h{match[1]}", int(match[2])
         items.append(_work_item(half, year, str(base_url.join(href)), str(response.url), None))
     return items
-
-
-def _page_base(tree: HTMLParser, page_url: str) -> httpx.URL:
-    """Resolution base for a page's relative hrefs, honouring any <base> tag."""
-    base = tree.css_first("base")
-    return httpx.URL((base.attributes.get("href") if base else None) or page_url)
 
 
 async def _sitemap_release_pages(client: httpx.AsyncClient) -> list[tuple[str, str, int]]:
@@ -113,7 +108,7 @@ async def _release_work_item(
 
 def _business_data_href(html: str, page_url: str) -> str | None:
     tree = HTMLParser(html)
-    base_url = _page_base(tree, page_url)
+    base_url = page_base(tree, page_url)
     for node in tree.css("a[href]"):
         href = node.attributes.get("href") or ""
         if "business-complaints-data" in href.lower() and href.lower().endswith(".xlsx"):

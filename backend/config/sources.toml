@@ -7,3 +7,7 @@
 [sources.fos_complaints]
 enabled = true
 schedule = "0 7 * * 1"
+
+[sources.fos_decisions]
+enabled = true
+schedule = "0 7 * * 2"
