@@ -36,10 +36,17 @@ _DIMENSION_COLUMNS: dict[
 }
 
 
+def dimension_column(
+    dimension: SummaryDimension,
+) -> InstrumentedAttribute[str] | InstrumentedAttribute[str | None]:
+    """The column a dimension groups by; shared with the trend query."""
+    return _DIMENSION_COLUMNS[dimension]
+
+
 def volume_by(
     session: Session, dimension: SummaryDimension, filters: SignalFilters, top: int = 20
 ) -> list[SummaryRow]:
-    key = _DIMENSION_COLUMNS[dimension]
+    key = dimension_column(dimension)
     volume = func.sum(func.coalesce(SignalRow.volume, 1)).label("volume")
     weighted = func.sum(SignalRow.upheld_share * SignalRow.volume).filter(
         SignalRow.upheld_share.is_not(None)

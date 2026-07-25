@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/api/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Runs */
+        get: operations["list_runs_api_runs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/signals": {
         parameters: {
             query?: never;
@@ -64,6 +81,23 @@ export interface paths {
         };
         /** Summarise */
         get: operations["summarise_api_summaries__dimension__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/trends/{dimension}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Trend */
+        get: operations["trend_api_trends__dimension__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -332,6 +366,20 @@ export interface components {
             /** Volume */
             volume: number;
         };
+        /** TrendPoint */
+        TrendPoint: {
+            /**
+             * Bucket
+             * Format: date
+             */
+            bucket: string;
+            /** Key */
+            key: string;
+            /** Signals */
+            signals: number;
+            /** Volume */
+            volume: number;
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -407,6 +455,38 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    list_runs_api_runs_get: {
+        parameters: {
+            query?: {
+                source_key?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IngestionRun"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_signals_api_signals_get: {
         parameters: {
             query?: {
@@ -524,6 +604,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SummaryRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    trend_api_trends__dimension__get: {
+        parameters: {
+            query?: {
+                series?: number;
+                source_key?: string | null;
+                kind?: components["schemas"]["SignalKind"] | null;
+                firm?: string | null;
+                category?: string | null;
+                period_from?: string | null;
+                period_to?: string | null;
+                search?: string | null;
+            };
+            header?: never;
+            path: {
+                dimension: components["schemas"]["SummaryDimension"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrendPoint"][];
                 };
             };
             /** @description Validation Error */

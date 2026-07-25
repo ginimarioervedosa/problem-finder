@@ -10,11 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RunsRouteImport } from './routes/runs'
 import { Route as SignalsRouteImport } from './routes/signals'
+import { Route as TrendsRouteImport } from './routes/trends'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RunsRoute = RunsRouteImport.update({
+  id: '/runs',
+  path: '/runs',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignalsRoute = SignalsRouteImport.update({
@@ -22,31 +29,44 @@ const SignalsRoute = SignalsRouteImport.update({
   path: '/signals',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TrendsRoute = TrendsRouteImport.update({
+  id: '/trends',
+  path: '/trends',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/runs': typeof RunsRoute
   '/signals': typeof SignalsRoute
+  '/trends': typeof TrendsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/runs': typeof RunsRoute
   '/signals': typeof SignalsRoute
+  '/trends': typeof TrendsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/runs': typeof RunsRoute
   '/signals': typeof SignalsRoute
+  '/trends': typeof TrendsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/signals'
+  fullPaths: '/' | '/runs' | '/signals' | '/trends'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/signals'
-  id: '__root__' | '/' | '/signals'
+  to: '/' | '/runs' | '/signals' | '/trends'
+  id: '__root__' | '/' | '/runs' | '/signals' | '/trends'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  RunsRoute: typeof RunsRoute
   SignalsRoute: typeof SignalsRoute
+  TrendsRoute: typeof TrendsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +78,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/runs': {
+      id: '/runs'
+      path: '/runs'
+      fullPath: '/runs'
+      preLoaderRoute: typeof RunsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signals': {
       id: '/signals'
       path: '/signals'
@@ -65,12 +92,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignalsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/trends': {
+      id: '/trends'
+      path: '/trends'
+      fullPath: '/trends'
+      preLoaderRoute: typeof TrendsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  RunsRoute: RunsRoute,
   SignalsRoute: SignalsRoute,
+  TrendsRoute: TrendsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
