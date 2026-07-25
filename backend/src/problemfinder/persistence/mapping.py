@@ -6,11 +6,12 @@ column set and the domain field set can never drift apart silently.
 """
 
 from problemfinder.domain.cursor import Cursor
+from problemfinder.domain.enrichment import SignalEnrichment
 from problemfinder.domain.identity import content_fingerprint
 from problemfinder.domain.ingestion_run import IngestionRun
 from problemfinder.domain.provenance import Provenance
 from problemfinder.domain.signal import AggregateSignal, SignalKind, VerbatimSignal
-from problemfinder.persistence.orm import CursorRow, IngestionRunRow, SignalRow
+from problemfinder.persistence.orm import CursorRow, IngestionRunRow, SignalEnrichmentRow, SignalRow
 
 type AnySignal = VerbatimSignal | AggregateSignal
 
@@ -81,6 +82,17 @@ def row_to_signal(row: SignalRow) -> AnySignal:
         return AggregateSignal.model_validate(payload)
     payload["author_handle"] = row.author_handle
     return VerbatimSignal.model_validate(payload)
+
+
+def enrichment_to_values(enrichment: SignalEnrichment) -> dict[str, object]:
+    """Column values for one enrichment row; field names match columns one to one."""
+    return enrichment.model_dump()
+
+
+def row_to_enrichment(row: SignalEnrichmentRow) -> SignalEnrichment:
+    return SignalEnrichment.model_validate(
+        {name: getattr(row, name) for name in SignalEnrichment.model_fields}
+    )
 
 
 def run_to_values(run: IngestionRun) -> dict[str, object]:

@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://pf:pf@localhost:5432/problemfinder"
     archive_dir: Path = REPO_ROOT / "data" / "archive"
     sources_config: Path = REPO_ROOT / "backend" / "config" / "sources.toml"
+    taxonomy_path: Path = REPO_ROOT / "backend" / "config" / "taxonomy.yaml"
     api_port: int = 8000
     cors_origin: str = "http://localhost:5173"
     # Reddit script-app OAuth credentials; .env only, never committed.

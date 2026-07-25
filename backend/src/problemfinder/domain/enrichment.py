@@ -23,13 +23,9 @@ class ResolutionStatus(StrEnum):
     UNKNOWN = "unknown"
 
 
-class SignalEnrichment(BaseModel):
-    """One versioned set of derived attributes for one signal."""
+class DerivedAttributes(BaseModel):
+    """The recomputable attribute set, shared by working drafts and stored rows."""
 
-    model_config = ConfigDict(frozen=True)
-
-    signal_id: UUID
-    version: int = Field(ge=1)
     theme: str | None = None
     sub_theme: str | None = None
     product_domain: ProductDomain | None = None
@@ -41,5 +37,14 @@ class SignalEnrichment(BaseModel):
     geography: str | None = None
     segment: WealthSegment | None = None
     sentiment: float | None = Field(default=None, ge=-1.0, le=1.0)
+
+
+class SignalEnrichment(DerivedAttributes):
+    """One versioned set of derived attributes for one signal."""
+
+    model_config = ConfigDict(frozen=True)
+
+    signal_id: UUID
+    version: int = Field(ge=1)
     method: str
     computed_at: AwareDatetime

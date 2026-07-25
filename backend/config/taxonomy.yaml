@@ -1,0 +1,143 @@
+# Theme taxonomy for rules-based enrichment (rules:v1).
+#
+# Editing this file changes opinions, not facts: rerun
+# `pf enrich run --recompute` and every derived attribute is rebuilt from the
+# stored signals. Nothing here touches raw ingestion.
+#
+# Matching: keywords are casefolded substrings over title + body. The theme
+# with the most distinct keyword hits wins; ties go to the theme declared
+# first, so declaration order is the priority order. Sub-themes match within
+# the winning theme only, first hit wins.
+
+# Source category label -> shared product domain. Keys are each source's own
+# vocabulary, verbatim; values are domain/dimensions.py ProductDomain members.
+product_domains:
+  # fos_complaints (aggregate statistics)
+  "Banking & Credit": banking_and_credit
+  "Decumulation Life & Pensions": pensions_and_decumulation
+  "Funeral Planning Services": funeral_planning
+  "General Insurance / Pure Protection": insurance_and_protection
+  "Investments": investments
+  "Mortgages & Home Finance": mortgages_and_home_finance
+  "PPI": insurance_and_protection
+  # fos_decisions (published decision texts)
+  "Banking and Payments": banking_and_credit
+  "Consumer Credit": banking_and_credit
+  "Insurance": insurance_and_protection
+  "Pensions and Annuities": pensions_and_decumulation
+  "Mortgages": mortgages_and_home_finance
+  "Claims Management": legal_services
+
+themes:
+  - name: fraud_and_scams
+    keywords:
+      - scam
+      - fraudster
+      - defrauded
+      - "authorised push payment"
+      - "safe account"
+      - "remote access"
+      - "recovery of the funds"
+    sub_themes:
+      - name: investment_scam
+        keywords: ["investment scam", cryptocurrency, crypto, "trading platform"]
+      - name: impersonation_scam
+        keywords: ["safe account", impersonat, "claiming to be from"]
+      - name: employment_scam
+        keywords: ["job scam", "employment scam", "commission"]
+      - name: romance_scam
+        keywords: ["romance scam", "met online"]
+      - name: purchase_scam
+        keywords: ["purchase scam", "never received the goods", "item never arrived"]
+
+  - name: fraud_markers_and_credit_records
+    keywords:
+      - cifas
+      - "fraud marker"
+      - "fraud prevention"
+      - "credit file"
+      - "credit report"
+      - "default registered"
+
+  - name: account_closure_and_access
+    keywords:
+      - "closed her account"
+      - "closed his account"
+      - "closed the account"
+      - "close the account"
+      - "account closure"
+      - "blocked her account"
+      - "blocked his account"
+      - "restricted the account"
+      - "froze the account"
+      - "frozen account"
+      - "withdrew banking facilities"
+
+  - name: disputed_transactions
+    keywords:
+      - chargeback
+      - "section 75"
+      - "disputed transaction"
+      - "didn't authorise"
+      - "did not authorise"
+      - "unauthorised transaction"
+      - "unauthorised payment"
+
+  - name: insurance_claim_handling
+    keywords:
+      - "declined the claim"
+      - "declined her claim"
+      - "declined his claim"
+      - "rejected the claim"
+      - "turned down the claim"
+      - "policy exclusion"
+      - "avoided the policy"
+      - "misrepresentation"
+      - "claim settlement"
+    sub_themes:
+      - name: valuation_dispute
+        keywords: [valuation, "market value", "total loss"]
+      - name: claim_declined
+        keywords: ["declined", "rejected the claim", "turned down"]
+
+  - name: mis_selling_and_advice
+    keywords:
+      - mis-sold
+      - "mis sold"
+      - mis-selling
+      - "unsuitable advice"
+      - "not suitable"
+      - "suitability"
+      - "advised to transfer"
+      - "pension transfer"
+      - "negligent advice"
+
+  - name: lending_and_affordability
+    keywords:
+      - unaffordable
+      - "irresponsible lending"
+      - affordability
+      - "creditworthiness"
+      - "proportionate checks"
+      - "lent irresponsibly"
+
+  - name: charges_and_fees
+    keywords:
+      - "early repayment charge"
+      - "exit fee"
+      - "excessive charges"
+      - "unfair charges"
+      - "overcharged"
+      - "annual management charge"
+      - "interest rate margin"
+
+  - name: delays_and_service_failures
+    keywords:
+      - "unreasonable delay"
+      - "delays in"
+      - "delayed the"
+      - "poor service"
+      - "customer service"
+      - "administrative error"
+      - "failed to respond"
+      - "lost paperwork"

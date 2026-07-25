@@ -18,6 +18,7 @@ dependencies = [
     "uvicorn>=0.32",
     "pypdf>=6.14.2",
     "apscheduler>=3.11.3",
+    "pyyaml>=6.0.3",
 ]
 
 [project.scripts]
@@ -33,6 +34,7 @@ dev = [
     "ruff>=0.8",
     "import-linter>=2.1",
     "pre-commit>=4.0",
+    "types-pyyaml>=6.0.12.20260724",
 ]
 
 [build-system]
@@ -100,9 +102,28 @@ type = "layers"
 layers = [
     "problemfinder.cli | problemfinder.worker",
     "problemfinder.api",
-    "problemfinder.queries | problemfinder.ingestion",
-    "problemfinder.sources | problemfinder.persistence | problemfinder.enrichment",
+    "problemfinder.queries | problemfinder.ingestion | problemfinder.enrichment",
+    "problemfinder.sources | problemfinder.persistence",
     "problemfinder.domain",
+]
+
+# The enrichment runner orchestrates persistence (like ingestion does), but the
+# rules themselves stay pure over domain models: no storage, no fetch, no SQL.
+# The layers row above already makes ingestion and enrichment mutually
+# independent, so raw ingestion can never depend on derived attributes.
+[[tool.importlinter.contracts]]
+name = "Enrichment rules are pure over domain models"
+type = "forbidden"
+source_modules = [
+    "problemfinder.enrichment.passes",
+    "problemfinder.enrichment.protocol",
+    "problemfinder.enrichment.taxonomy",
+    "problemfinder.enrichment.ruleset",
+    "problemfinder.enrichment.derive",
+]
+forbidden_modules = [
+    "problemfinder.persistence", "problemfinder.sources", "problemfinder.settings",
+    "sqlalchemy",
 ]
 
 [[tool.importlinter.contracts]]
