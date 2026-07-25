@@ -17,6 +17,11 @@ from problemfinder.domain.signal import AggregateSignal, VerbatimSignal
 from problemfinder.domain.source_policy import SourcePolicy
 
 
+class SourceParseError(ValueError):
+    """A payload could not be interpreted. The only exception parse may raise:
+    anything else escaping an adapter's parse stage is a bug, not bad data."""
+
+
 class WorkItem(BaseModel):
     """One fetchable unit an adapter has discovered: a file, a page, an API call.
 
