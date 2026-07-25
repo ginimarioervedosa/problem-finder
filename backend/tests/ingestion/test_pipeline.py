@@ -66,3 +66,26 @@ async def test_reingest_is_idempotent(
 async def test_unknown_source_fails_loudly(pipeline_db: Engine) -> None:
     with pytest.raises(registry.UnknownSourceError):
         await pipeline.run_source("nope")
+
+
+async def test_cursor_persists_across_runs_and_resumes_discovery(
+    stub: StubSource, pipeline_db: Engine, tmp_archive: Path
+) -> None:
+    first = await pipeline.run_source("stub")
+    second = await pipeline.run_source("stub")
+
+    assert first.cursor_before is None
+    assert first.cursor_after is not None
+    assert first.cursor_after.state == {"last": "item-2"}
+    assert second.cursor_before == first.cursor_after
+    assert stub.cursors_seen == [None, first.cursor_after]
+
+
+async def test_full_run_ignores_the_saved_cursor(
+    stub: StubSource, pipeline_db: Engine, tmp_archive: Path
+) -> None:
+    await pipeline.run_source("stub")
+    full = await pipeline.run_source("stub", full=True)
+    assert stub.cursors_seen == [None, None]
+    assert full.cursor_before is None
+    assert full.cursor_after is not None  # the cursor is still refolded and saved

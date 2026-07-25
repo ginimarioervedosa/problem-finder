@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     sources_config: Path = REPO_ROOT / "backend" / "config" / "sources.toml"
     api_port: int = 8000
     cors_origin: str = "http://localhost:5173"
+    # Reddit script-app OAuth credentials; .env only, never committed.
+    reddit_client_id: str = ""
+    reddit_client_secret: str = ""
 
 
 @lru_cache

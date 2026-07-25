@@ -1,0 +1,72 @@
+{
+  "kind": "Listing",
+  "data": {
+    "after": "t3_1abcd03",
+    "dist": 3,
+    "modhash": null,
+    "geo_filter": "",
+    "children": [
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_1abcd01",
+          "id": "1abcd01",
+          "title": "Private bank froze my account mid-completion",
+          "selftext": "Exchanged on a property purchase and my private bank froze the account for a compliance review two days before completion. No timeline given. Has anyone escalated something like this successfully?",
+          "author": "throwaway_hnw",
+          "created_utc": 1753380000.0,
+          "permalink": "/r/HENRYUK/comments/1abcd01/private_bank_froze_my_account_midcompletion/",
+          "subreddit": "HENRYUK",
+          "subreddit_name_prefixed": "r/HENRYUK",
+          "score": 187,
+          "ups": 187,
+          "num_comments": 64,
+          "over_18": false,
+          "url": "https://www.reddit.com/r/HENRYUK/comments/1abcd01/private_bank_froze_my_account_midcompletion/",
+          "is_self": true
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_1abcd02",
+          "id": "1abcd02",
+          "title": "SIPP transfer stuck for 11 weeks, provider blames the ceding scheme",
+          "selftext": "",
+          "author": "pensions_weary",
+          "created_utc": 1753293600.0,
+          "permalink": "/r/HENRYUK/comments/1abcd02/sipp_transfer_stuck_for_11_weeks/",
+          "subreddit": "HENRYUK",
+          "subreddit_name_prefixed": "r/HENRYUK",
+          "score": 42,
+          "ups": 42,
+          "num_comments": 18,
+          "over_18": false,
+          "url": "https://example.org/news/sipp-transfer-delays",
+          "is_self": false
+        }
+      },
+      {
+        "kind": "t3",
+        "data": {
+          "name": "t3_1abcd03",
+          "id": "1abcd03",
+          "title": "CGT reporting nightmare after broker migration",
+          "selftext": "My broker migrated platforms and half my book cost data is gone. Their support says to reconstruct it from contract notes myself.",
+          "author": "quietcompounder",
+          "created_utc": 1753207200.0,
+          "permalink": "/r/HENRYUK/comments/1abcd03/cgt_reporting_nightmare_after_broker_migration/",
+          "subreddit": "HENRYUK",
+          "subreddit_name_prefixed": "r/HENRYUK",
+          "score": 15,
+          "ups": 15,
+          "num_comments": 7,
+          "over_18": false,
+          "url": "https://www.reddit.com/r/HENRYUK/comments/1abcd03/cgt_reporting_nightmare_after_broker_migration/",
+          "is_self": true
+        }
+      }
+    ],
+    "before": null
+  }
+}

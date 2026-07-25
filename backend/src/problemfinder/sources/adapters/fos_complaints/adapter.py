@@ -45,9 +45,11 @@ class FosComplaintsSource:
     )
 
     async def discover(self, cursor: Cursor | None) -> AsyncIterator[WorkItem]:
+        seen = _ingested_periods(cursor)
         async with client_for(self.key, self.policy) as client:
             for item in await discover_releases(client):
-                yield item
+                if item.external_id not in seen:
+                    yield item
 
     async def fetch(self, item: WorkItem) -> RawDocument:
         return await fetch_one(self.key, self.policy, item, default_media_type=_XLSX)
@@ -59,10 +61,19 @@ class FosComplaintsSource:
         return to_signal(self.key, record, provenance)
 
     def cursor_after(self, cursor: Cursor | None, done: Sequence[WorkItem]) -> Cursor:
-        periods: list[JsonValue] = [item.external_id for item in done]
-        periods.sort(key=str)
+        merged = _ingested_periods(cursor) | {item.external_id for item in done}
+        periods: list[JsonValue] = []
+        periods.extend(sorted(merged))
         return Cursor(
             source_key=self.key,
             state={"ingested_periods": periods},
             updated_at=datetime.now(tz=UTC),
         )
+
+
+def _ingested_periods(cursor: Cursor | None) -> set[str]:
+    """Half-year period keys already ingested, out of the cursor's state."""
+    if cursor is None:
+        return set()
+    periods = cursor.state.get("ingested_periods")
+    return {str(period) for period in periods} if isinstance(periods, list) else set()

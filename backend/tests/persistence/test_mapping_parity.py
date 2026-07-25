@@ -11,9 +11,10 @@ from typing import get_args
 
 from pydantic import BaseModel
 
+from problemfinder.domain.cursor import Cursor
 from problemfinder.domain.raw_payload import RawPayloadMeta
 from problemfinder.domain.signal import AggregateSignal, SignalCore, VerbatimSignal
-from problemfinder.persistence.orm import RawPayloadRow, SignalRow
+from problemfinder.persistence.orm import CursorRow, RawPayloadRow, SignalRow
 
 PROVENANCE_COLUMNS = {"raw_payload_sha256", "adapter_version", "ingestion_run_id", "fetched_at"}
 PERSISTENCE_ONLY_COLUMNS = {"dedupe_hash", "search_tsv"}
@@ -57,3 +58,8 @@ def test_variant_specific_fields_are_nullable_columns() -> None:
 def test_raw_payload_columns_equal_meta_fields() -> None:
     actual = {column.name for column in RawPayloadRow.__table__.columns}
     assert actual == set(RawPayloadMeta.model_fields)
+
+
+def test_cursor_columns_equal_domain_fields() -> None:
+    actual = {column.name for column in CursorRow.__table__.columns}
+    assert actual == set(Cursor.model_fields)

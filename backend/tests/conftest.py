@@ -73,6 +73,6 @@ def pipeline_db(db_engine: Engine, monkeypatch: pytest.MonkeyPatch) -> Generator
     reset_engine()
     yield db_engine
     with db_engine.begin() as connection:
-        connection.execute(text("truncate signals, raw_payloads, ingestion_runs cascade"))
+        connection.execute(text("truncate signals, raw_payloads, ingestion_runs, cursors cascade"))
     get_settings.cache_clear()
     reset_engine()

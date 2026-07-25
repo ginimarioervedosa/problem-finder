@@ -3,8 +3,8 @@
 The search serves ten results per page through a Start offset; each card
 carries the decision reference, date, business, outcome, and sector, which
 travel as request_hints so later stages never revisit the listing pages. The
-window is fixed here for phase 2; per-source config arrives with the phase 3
-scheduler work, at which point widening it becomes a config change.
+window comes from the source's options in sources.toml; widening it is a
+config change, never a code change.
 """
 
 import re
@@ -15,21 +15,51 @@ import httpx
 from pydantic import JsonValue
 from selectolax.parser import HTMLParser, Node
 
+from problemfinder.domain.cursor import Cursor
 from problemfinder.domain.source_policy import SourcePolicy
+from problemfinder.sources.config import source_options
 from problemfinder.sources.http import client_for
 from problemfinder.sources.page_base import page_base
 from problemfinder.sources.protocol import WorkItem
 
 BASE = "https://www.financial-ombudsman.org.uk"
 SEARCH_URL = f"{BASE}/businesses/resolving-complaint/ombudsman-decisions/search"
-WINDOW_FROM = date(2025, 1, 1)
-WINDOW_TO = date(2025, 6, 30)
+_DEFAULT_WINDOW = (date(2025, 1, 1), date(2025, 6, 30))
 _PAGE_SIZE = 10
 _DRN_RE = re.compile(r"DRN-\d+", re.IGNORECASE)
 _OUTCOMES = {"upheld", "not upheld"}
 
 
-async def discover_decisions(source_key: str, policy: SourcePolicy) -> AsyncIterator[WorkItem]:
+def decision_window(source_key: str, cursor: Cursor | None) -> tuple[date, date]:
+    """(from, to) out of the source's options, resumed from the cursor.
+
+    TOML dates arrive as `date`. A cursor narrows the start to the newest
+    decision date already seen; the same day is refetched and deduped rather
+    than risk missing decisions published later that day.
+    """
+    options = source_options(source_key)
+    window_from = options.get("window_from", _DEFAULT_WINDOW[0])
+    window_to = options.get("window_to", _DEFAULT_WINDOW[1])
+    if not isinstance(window_from, date) or not isinstance(window_to, date):
+        msg = f"{source_key}: window_from/window_to must be TOML dates"
+        raise TypeError(msg)
+    latest = latest_decision_date(cursor)
+    if latest is not None:
+        window_from = max(window_from, latest)
+    return window_from, window_to
+
+
+def latest_decision_date(cursor: Cursor | None) -> date | None:
+    """The newest decision date folded into the cursor, if any."""
+    if cursor is None:
+        return None
+    state = cursor.state.get("latest_decision_date")
+    return date.fromisoformat(state) if isinstance(state, str) else None
+
+
+async def discover_decisions(
+    source_key: str, policy: SourcePolicy, window: tuple[date, date]
+) -> AsyncIterator[WorkItem]:
     """Yield one work item per decision, paging until the search runs dry.
 
     The walk can span thousands of pages, so discovery owns its client for
@@ -38,7 +68,7 @@ async def discover_decisions(source_key: str, policy: SourcePolicy) -> AsyncIter
     async with client_for(source_key, policy) as client:
         start = 0
         while True:
-            response = await client.get(SEARCH_URL, params=_params(start))
+            response = await client.get(SEARCH_URL, params=_params(start, window))
             response.raise_for_status()
             items = _page_items(response.text, str(response.url))
             if not items:
@@ -48,11 +78,11 @@ async def discover_decisions(source_key: str, policy: SourcePolicy) -> AsyncIter
             start += _PAGE_SIZE
 
 
-def _params(start: int) -> dict[str, str]:
+def _params(start: int, window: tuple[date, date]) -> dict[str, str]:
     return {
         "Sort": "date",
-        "DateFrom": WINDOW_FROM.isoformat(),
-        "DateTo": WINDOW_TO.isoformat(),
+        "DateFrom": window[0].isoformat(),
+        "DateTo": window[1].isoformat(),
         "Start": str(start),
     }
 
