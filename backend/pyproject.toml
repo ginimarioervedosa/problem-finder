@@ -1,0 +1,122 @@
+[project]
+name = "problemfinder"
+version = "0.1.0"
+description = "Local research tool: normalise public complaint and forum data into ranked problem themes"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.115",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "sqlalchemy>=2.0.36",
+    "alembic>=1.14",
+    "psycopg[binary]>=3.2",
+    "typer>=0.15",
+    "httpx>=0.28",
+    "selectolax>=0.3.27",
+    "polars>=1.17",
+    "fastexcel>=0.12",
+    "uvicorn>=0.32",
+]
+
+[project.scripts]
+pf = "problemfinder.cli.main:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.25",
+    "hypothesis>=6.120",
+    "respx>=0.22",
+    "mypy>=1.13",
+    "ruff>=0.8",
+    "import-linter>=2.1",
+    "pre-commit>=4.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/problemfinder"]
+
+# --- quality gates -------------------------------------------------------------
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "N", "UP", "B", "C4", "SIM", "RUF", "TID",
+    "C90",           # cyclomatic complexity ceiling
+    "PL",            # pylint: argument/branch/statement ceilings
+    "ANN",           # type annotations required everywhere
+]
+ignore = [
+    "PLR2004",       # magic-value comparisons; test assertions use literals
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["PLR0913"]
+
+[tool.mypy]
+strict = true
+python_version = "3.13"
+files = ["src", "tests"]
+mypy_path = "src"
+explicit_package_bases = true
+plugins = ["pydantic.mypy"]
+warn_unreachable = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+    "db: requires the docker-compose Postgres (run `make up` first)",
+]
+
+# --- layering contract ----------------------------------------------------------
+# Dependencies point inwards only. See CLAUDE.md for the prose version.
+
+[tool.importlinter]
+root_package = "problemfinder"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Layered architecture"
+type = "layers"
+layers = [
+    "problemfinder.cli | problemfinder.worker",
+    "problemfinder.api",
+    "problemfinder.queries | problemfinder.ingestion",
+    "problemfinder.sources | problemfinder.persistence | problemfinder.enrichment",
+    "problemfinder.domain",
+]
+
+[[tool.importlinter.contracts]]
+name = "Domain purity"
+type = "forbidden"
+source_modules = ["problemfinder.domain"]
+forbidden_modules = [
+    "fastapi", "sqlalchemy", "alembic", "httpx", "typer",
+    "polars", "selectolax", "playwright", "apscheduler",
+    "problemfinder.settings",
+]
+
+[[tool.importlinter.contracts]]
+name = "Source adapters are independent of each other"
+type = "independence"
+modules = ["problemfinder.sources.adapters.*"]
+
+[[tool.importlinter.contracts]]
+name = "Fetch and parse libraries stay behind the adapter interface"
+type = "forbidden"
+source_modules = [
+    "problemfinder.domain", "problemfinder.persistence", "problemfinder.enrichment",
+    "problemfinder.ingestion", "problemfinder.queries", "problemfinder.api",
+]
+forbidden_modules = ["httpx", "selectolax", "playwright"]
