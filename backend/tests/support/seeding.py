@@ -9,6 +9,14 @@ from problemfinder.persistence.orm import IngestionRunRow, RawPayloadRow, Signal
 
 
 def seed_signals(session: Session, signals: Sequence[AnySignal]) -> None:
+    seed_provenance(session, signals)
+    for signal in signals:
+        session.add(SignalRow(**signal_to_values(signal)))
+    session.flush()
+
+
+def seed_provenance(session: Session, signals: Sequence[AnySignal]) -> None:
+    """Insert only the payload and run rows the signals' foreign keys need."""
     for signal in signals:
         provenance = signal.provenance
         session.merge(
@@ -39,7 +47,4 @@ def seed_signals(session: Session, signals: Sequence[AnySignal]) -> None:
                 errors=[],
             )
         )
-    session.flush()
-    for signal in signals:
-        session.add(SignalRow(**signal_to_values(signal)))
     session.flush()
