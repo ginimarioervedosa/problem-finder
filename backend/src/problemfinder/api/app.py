@@ -12,6 +12,9 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[get_settings().cors_origin],
+        # Single-user local tool: the dev server may sit on any localhost port
+        # (Vite falls back when 5173 is taken), so any localhost origin is fine.
+        allow_origin_regex=r"http://localhost:\d+",
         allow_methods=["GET"],
         allow_headers=["*"],
     )

@@ -76,3 +76,28 @@ def test_detail_lookup(seeded: Session) -> None:
     [first], _ = search_signals(seeded, SignalFilters(), limit=1)
     assert get_signal(seeded, str(first.id)) == first
     assert get_signal(seeded, "00000000-0000-0000-0000-000000000000") is None
+
+
+def test_search_matches_stemmed_words_in_the_body(seeded: Session) -> None:
+    items, total = search_signals(seeded, SignalFilters(search="transfers stalling"))
+    assert total == 1
+    assert items[0].kind is SignalKind.VERBATIM
+
+
+def test_search_covers_titles_too(seeded: Session) -> None:
+    _, total = search_signals(seeded, SignalFilters(search="complaints"))
+    assert total == 3  # every aggregate title mentions complaints
+
+
+def test_search_supports_phrases_and_finds_nothing_gracefully(seeded: Session) -> None:
+    _, phrase = search_signals(seeded, SignalFilters(search='"SIPP transfer"'))
+    assert phrase == 1
+    _, none = search_signals(seeded, SignalFilters(search="mortgage"))
+    assert none == 0
+
+
+def test_search_composes_with_other_filters(seeded: Session) -> None:
+    filters = SignalFilters(search="complaints", firm="Beta")
+    items, total = search_signals(seeded, filters)
+    assert total == 1
+    assert items[0].firm_name == "Beta Wealth"

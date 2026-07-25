@@ -9,7 +9,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   plugins: [tanstackRouter({ target: "react", autoCodeSplitting: true }), react(), tailwindcss()],
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
-  server: { port: 5173 },
+  server: { port: Number(process.env.PORT) || 5173 },
   test: {
     environment: "jsdom",
     globals: true,

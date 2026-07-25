@@ -98,6 +98,7 @@ cli, worker  ->  api  ->  queries, ingestion  ->  sources, persistence, enrichme
 | `make check` | Every quality gate (backend, frontend, shared) |
 | `make test` | Test suites only |
 | `cd backend && uv run pf ingest list` | Show registered sources, method, enablement |
+| `cd backend && uv run pf reparse <key>` | Replay a source's archive through parse + normalise, no refetch |
 | `cd backend && uv run pf db revision -m "..."` | Autogenerate a migration |
 
 Database tests need `make up` first; they fail loudly, never skip silently.

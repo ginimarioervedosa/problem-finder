@@ -18,7 +18,8 @@ from problemfinder.domain.source_policy import (
 from problemfinder.sources.adapters.fos_complaints.discover import discover_releases
 from problemfinder.sources.adapters.fos_complaints.normalise import to_signal
 from problemfinder.sources.adapters.fos_complaints.parser import parse_workbook
-from problemfinder.sources.http import client_for
+from problemfinder.sources.fetch import fetch_one
+from problemfinder.sources.http import IDENTIFYING_USER_AGENT, client_for
 from problemfinder.sources.protocol import ParsedRecord, RawDocument, WorkItem
 from problemfinder.sources.registry import register
 
@@ -40,9 +41,7 @@ class FosComplaintsSource:
             "publish XLSX/CSV downloads explicitly."
         ),
         rate_limit=RateLimit(requests=1, per_seconds=2.0),
-        user_agent=(
-            "problem-finder/0.1 (single-user research tool; contact: mario.ervedosa@thegini.co.uk)"
-        ),
+        user_agent=IDENTIFYING_USER_AGENT,
     )
 
     async def discover(self, cursor: Cursor | None) -> AsyncIterator[WorkItem]:
@@ -51,16 +50,7 @@ class FosComplaintsSource:
                 yield item
 
     async def fetch(self, item: WorkItem) -> RawDocument:
-        async with client_for(self.key, self.policy) as client:
-            response = await client.get(str(item.url))
-            response.raise_for_status()
-            return RawDocument(
-                work_item=item,
-                content=response.content,
-                media_type=response.headers.get("content-type", _XLSX),
-                fetched_at=datetime.now(tz=UTC),
-                http_status=response.status_code,
-            )
+        return await fetch_one(self.key, self.policy, item, default_media_type=_XLSX)
 
     def parse(self, raw: RawDocument) -> Iterator[ParsedRecord]:
         return parse_workbook(raw)

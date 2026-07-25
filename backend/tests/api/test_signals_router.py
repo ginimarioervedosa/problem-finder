@@ -48,8 +48,9 @@ def test_summaries_by_category(client: TestClient) -> None:
 
 
 def test_sources_lists_fos_with_policy(client: TestClient) -> None:
-    [fos] = client.get("/api/sources").json()
-    assert fos["key"] == "fos_complaints"
+    sources = {entry["key"]: entry for entry in client.get("/api/sources").json()}
+    assert set(sources) == {"fos_complaints", "fos_decisions"}
+    fos = sources["fos_complaints"]
     assert fos["enabled"] is True
     assert fos["policy"]["method"] == "bulk_download"
     assert fos["last_run"]["source_key"] == "fos_complaints"  # seeded provenance run

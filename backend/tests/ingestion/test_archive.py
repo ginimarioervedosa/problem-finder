@@ -12,7 +12,11 @@ from problemfinder.sources.protocol import RawDocument, WorkItem
 
 def make_raw(content: bytes = b"payload") -> RawDocument:
     return RawDocument(
-        work_item=WorkItem(external_id="x", url="https://example.org/x"),
+        work_item=WorkItem(
+            external_id="x",
+            url="https://example.org/x",
+            request_hints={"period": "h1-2025"},
+        ),
         content=content,
         media_type="text/plain",
         fetched_at=datetime(2026, 7, 1, tzinfo=UTC),
@@ -50,3 +54,9 @@ def test_different_content_never_collides(tmp_archive: Path) -> None:
 def test_load_round_trips(tmp_archive: Path) -> None:
     meta = store(make_raw(b"replay me"), "stub", adapter_version=1)
     assert load(meta.relative_path) == b"replay me"
+
+
+def test_store_captures_work_item_identity_and_hints(tmp_archive: Path) -> None:
+    meta = store(make_raw(), "stub", adapter_version=1)
+    assert meta.external_id == "x"
+    assert meta.request_hints == {"period": "h1-2025"}

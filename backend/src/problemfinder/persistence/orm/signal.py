@@ -7,8 +7,8 @@ parity test asserts this table and the domain union never drift apart.
 from datetime import date, datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime, ForeignKey, String, Text, UniqueConstraint
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Computed, DateTime, ForeignKey, Index, String, Text, UniqueConstraint
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column
 
 from problemfinder.persistence.orm.base import Base
@@ -16,7 +16,10 @@ from problemfinder.persistence.orm.base import Base
 
 class SignalRow(Base):
     __tablename__ = "signals"
-    __table_args__ = (UniqueConstraint("source_key", "external_id"),)
+    __table_args__ = (
+        UniqueConstraint("source_key", "external_id"),
+        Index("ix_signals_search_tsv", "search_tsv", postgresql_using="gin"),
+    )
 
     id: Mapped[UUID] = mapped_column(primary_key=True)
     source_key: Mapped[str] = mapped_column(String(64), index=True)
@@ -49,3 +52,9 @@ class SignalRow(Base):
     fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
     dedupe_hash: Mapped[str] = mapped_column(String(64), index=True)
+
+    # Full-text search over title and body; computed by Postgres, never inserted.
+    search_tsv: Mapped[str] = mapped_column(
+        TSVECTOR,
+        Computed("to_tsvector('english', coalesce(title, '') || ' ' || body)", persisted=True),
+    )

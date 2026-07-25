@@ -13,9 +13,20 @@ const selectClass =
   "h-9 rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50";
 
 export function FilterPanel({ categories }: { categories: string[] }) {
-  const { firm, category, kind, setFirm, setCategory, setKind, reset } = useFilterStore();
+  const { search, firm, category, kind, setSearch, setFirm, setCategory, setKind, reset } =
+    useFilterStore();
   return (
     <div className="flex flex-wrap items-center gap-3">
+      <Input
+        type="search"
+        value={search}
+        onChange={(event) => {
+          setSearch(event.target.value);
+        }}
+        placeholder="Search signal text…"
+        className="w-72"
+        aria-label="Search signal text"
+      />
       <Input
         value={firm}
         onChange={(event) => {

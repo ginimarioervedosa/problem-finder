@@ -6,9 +6,11 @@ import type { components } from "@/api/schema";
 type SignalKind = components["schemas"]["SignalKind"];
 
 interface FilterState {
+  search: string;
   firm: string;
   category: string | null;
   kind: SignalKind | null;
+  setSearch: (search: string) => void;
   setFirm: (firm: string) => void;
   setCategory: (category: string | null) => void;
   setKind: (kind: SignalKind | null) => void;
@@ -16,9 +18,13 @@ interface FilterState {
 }
 
 export const useFilterStore = create<FilterState>()((set) => ({
+  search: "",
   firm: "",
   category: null,
   kind: null,
+  setSearch: (search) => {
+    set({ search });
+  },
   setFirm: (firm) => {
     set({ firm });
   },
@@ -29,6 +35,6 @@ export const useFilterStore = create<FilterState>()((set) => ({
     set({ kind });
   },
   reset: () => {
-    set({ firm: "", category: null, kind: null });
+    set({ search: "", firm: "", category: null, kind: null });
   },
 }));

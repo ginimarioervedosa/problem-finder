@@ -20,9 +20,11 @@ export const Route = createFileRoute("/signals")({
 });
 
 function SignalsPage() {
-  const { firm, category, kind, setCategory } = useFilterStore();
+  const { search, firm, category, kind, setCategory } = useFilterStore();
+  const debouncedSearch = useDebouncedValue(search);
   const debouncedFirm = useDebouncedValue(firm);
   const filterQuery = {
+    search: debouncedSearch || undefined,
     firm: debouncedFirm || undefined,
     category: category ?? undefined,
     kind: kind ?? undefined,
@@ -31,14 +33,18 @@ function SignalsPage() {
   const [pageIndex, setPageIndex] = useState(0);
   useEffect(() => {
     setPageIndex(0);
-  }, [debouncedFirm, category, kind]);
+  }, [debouncedSearch, debouncedFirm, category, kind]);
 
   const signals = useSignalsQuery({
     ...filterQuery,
     limit: PAGE_SIZE,
     offset: pageIndex * PAGE_SIZE,
   });
-  const categorySummary = useSummaryQuery("category", { firm: filterQuery.firm, kind: filterQuery.kind });
+  const categorySummary = useSummaryQuery("category", {
+    search: filterQuery.search,
+    firm: filterQuery.firm,
+    kind: filterQuery.kind,
+  });
   const [selected, setSelected] = useState<Signal | null>(null);
 
   const categories = (categorySummary.data ?? []).map((row) => row.key);

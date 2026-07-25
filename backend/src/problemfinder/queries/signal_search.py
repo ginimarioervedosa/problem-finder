@@ -44,8 +44,9 @@ def apply_filters(
     if filters.period_to:
         stmt = stmt.where(effective_date() <= filters.period_to)
     if filters.search:
-        needle = f"%{filters.search}%"
-        stmt = stmt.where(SignalRow.body.ilike(needle) | SignalRow.title.ilike(needle))
+        # websearch syntax: quoted phrases, OR, and -exclusions all work.
+        query = func.websearch_to_tsquery("english", filters.search)
+        stmt = stmt.where(SignalRow.search_tsv.bool_op("@@")(query))
     return stmt
 
 
