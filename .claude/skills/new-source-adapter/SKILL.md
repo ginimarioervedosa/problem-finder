@@ -27,6 +27,10 @@ Create `backend/src/problemfinder/sources/adapters/<key>/` (snake_case key):
 - `__init__.py` — one-paragraph docstring: what the source is, what one signal represents.
 - `adapter.py` — `@register` class with `key`, `version = 1`, `policy`, and the five
   protocol methods. Copy the shape from `adapters/fos_complaints/adapter.py`.
+  Plain one-GET fetches delegate to `sources.fetch.fetch_one`; the user agent is
+  `sources.http.IDENTIFYING_USER_AGENT`; shared helpers live in `sources.page_base`
+  (FOS `<base>` tag resolution) and `sources.record_fields` (typed field readers).
+  Never copy helper code between adapters; promote it to a named shared module.
 - `parser.py` — pure bytes -> `ParsedRecord`s. Raise `SourceParseError` for bad payloads,
   never anything else. Fold `work_item.request_hints` into record fields.
 - `normalise.py` — `ParsedRecord` + `Provenance` -> `VerbatimSignal` or `AggregateSignal`.

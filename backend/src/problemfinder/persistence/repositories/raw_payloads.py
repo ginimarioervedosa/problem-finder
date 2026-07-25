@@ -1,5 +1,6 @@
 """The database index into the on-disk raw archive."""
 
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
@@ -21,3 +22,13 @@ def add_if_absent(session: Session, meta: RawPayloadMeta) -> bool:
 def get(session: Session, sha256: str) -> RawPayloadMeta | None:
     row = session.get(RawPayloadRow, sha256)
     return RawPayloadMeta.model_validate(row, from_attributes=True) if row else None
+
+
+def list_for_source(session: Session, source_key: str) -> list[RawPayloadMeta]:
+    """Every archived payload of one source, oldest fetch first, for replay."""
+    rows = session.execute(
+        select(RawPayloadRow)
+        .where(RawPayloadRow.source_key == source_key)
+        .order_by(RawPayloadRow.fetched_at, RawPayloadRow.sha256)
+    ).scalars()
+    return [RawPayloadMeta.model_validate(row, from_attributes=True) for row in rows]

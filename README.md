@@ -63,10 +63,12 @@ cli, worker -> api -> queries, ingestion -> sources, persistence, enrichment -> 
        )
    ```
 
-   Implement `discover` (yield `WorkItem`s), `fetch` (one `RawDocument` per item, via
-   `sources.http.client_for`), `parse` (pure: bytes to `ParsedRecord`s), `normalise`
-   (record + provenance to a `VerbatimSignal` or `AggregateSignal`), and
-   `cursor_after`. Signal ids come from `domain.identity.signal_id_for`.
+   Implement `discover` (yield `WorkItem`s), `fetch` (one `RawDocument` per item;
+   `sources.fetch.fetch_one` covers the plain-GET case), `parse` (pure: bytes to
+   `ParsedRecord`s), `normalise` (record + provenance to a `VerbatimSignal` or
+   `AggregateSignal`), and `cursor_after`. Signal ids come from
+   `domain.identity.signal_id_for`; every HTTP call goes through
+   `sources.http.client_for`.
 
 3. **Add one config entry** in `backend/config/sources.toml`:
 
@@ -97,7 +99,20 @@ its package. The `.claude/skills/new-source-adapter` skill automates this scaffo
 
 ## Exploring the data
 
-The UI at `localhost:5173` gives ranked volumes by category, filterable by firm,
-category, kind and period, with drill-through to each signal's provenance (archived
-payload hash, ingestion run, link to the original). Notebooks can connect read-only
-to `postgresql://pf:pf@localhost:5432/problemfinder`.
+The UI at `localhost:5173` gives ranked volumes by category, filterable by free-text
+search (Postgres full-text over titles and bodies, with phrase and `-exclusion`
+syntax), firm, category, kind and period, with drill-through to each signal's
+provenance (archived payload hash, ingestion run, link to the original). Notebooks
+can connect read-only to `postgresql://pf:pf@localhost:5432/problemfinder`.
+
+## Reparsing history
+
+Parsers are disposable by design. After improving one, bump the adapter's `version`
+and replay the archive; nothing is refetched:
+
+```bash
+cd backend && uv run pf reparse fos_complaints
+```
+
+Signal identities are stable (UUIDv5 of source and external id), so regenerated
+signals overwrite in place.
