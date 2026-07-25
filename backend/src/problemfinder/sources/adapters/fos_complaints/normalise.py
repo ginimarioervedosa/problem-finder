@@ -11,11 +11,23 @@ from problemfinder.sources.protocol import ParsedRecord
 
 _NO_GROUP = "No Group"
 
+# The GI category label drifted across eras; one canonical label keeps the
+# dimension clean while extras retain the source's own wording.
+_CATEGORY_CANON = {
+    "general insurance / pure protection (includes ppi)": "General Insurance / Pure Protection",
+    "general insurance / pure protection (including ppi)": "General Insurance / Pure Protection",
+}
+
+
+def canonical_category(label: str) -> str:
+    return _CATEGORY_CANON.get(label.strip().casefold(), label.strip())
+
 
 def to_signal(source_key: str, record: ParsedRecord, provenance: Provenance) -> AggregateSignal:
     fields = record.fields
     business = _text(fields, "business_name") or "Unknown business"
-    category = _text(fields, "category") or "Uncategorised"
+    source_category = _text(fields, "category") or "Uncategorised"
+    category = canonical_category(source_category)
     volume = _int(fields, "volume") or 0
     upheld_share = _float(fields, "upheld_share")
     label = _period_label(_text(fields, "period") or record.external_id)
@@ -47,6 +59,7 @@ def to_signal(source_key: str, record: ParsedRecord, provenance: Provenance) -> 
             "business_group": None if group == _NO_GROUP else group,
             "total_new_cases": _int(fields, "total_new_cases"),
             "period": _text(fields, "period"),
+            "source_category": source_category,
         },
         period_start=date.fromisoformat(_text(fields, "period_start") or ""),
         period_end=date.fromisoformat(_text(fields, "period_end") or ""),

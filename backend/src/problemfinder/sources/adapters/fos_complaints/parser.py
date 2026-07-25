@@ -30,7 +30,8 @@ def parse_workbook(raw: RawDocument) -> Iterator[ParsedRecord]:
     upheld = upheld_lookup(resolved.rows())
     for row in new_cases.rows()[_DATA_START_ROW:]:
         business = text(row[0])
-        if business is None or _is_totals_or_footnote(business):
+        group = text(row[1])
+        if business is None or _is_totals_or_footnote(business, group):
             continue
         volumes = [count(cell) or 0 for cell in row[3 : 3 + len(categories)]]
         for category, volume in zip(categories, volumes, strict=False):
@@ -38,7 +39,7 @@ def parse_workbook(raw: RawDocument) -> Iterator[ParsedRecord]:
                 continue
             fields: dict[str, JsonValue] = {
                 "business_name": business,
-                "business_group": text(row[1]),
+                "business_group": group,
                 "category": category,
                 "volume": volume,
                 "upheld_share": category_share(upheld.get(business, {}), category),
@@ -83,9 +84,20 @@ def _categories(new_cases: pl.DataFrame) -> list[str]:
     return [label for cell in header[_CATEGORY_START_COL:] if (label := text(cell))]
 
 
-def _is_totals_or_footnote(business: str) -> bool:
+_TOTALS_RE = re.compile(r"^totals?\b", re.IGNORECASE)
+
+
+def _is_totals_or_footnote(business: str, group: str | None) -> bool:
+    """Summary and footnote rows, not businesses.
+
+    Totals labels vary by era ('TOTALS', 'Total (45/ 45 Threshold)', 'Totals of
+    the above'); all of them have an empty group cell, which is what protects a
+    real firm whose name merely starts with 'Total'.
+    """
     lowered = business.lower()
-    return lowered.startswith("*") or "total number of complaints" in lowered
+    if lowered.startswith("*") or "total number of complaints" in lowered:
+        return True
+    return bool(_TOTALS_RE.match(business)) and group is None
 
 
 def _slug(value: str) -> str:

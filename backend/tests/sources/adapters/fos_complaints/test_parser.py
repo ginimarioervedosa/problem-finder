@@ -7,7 +7,10 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from problemfinder.sources.adapters.fos_complaints.parser import parse_workbook
+from problemfinder.sources.adapters.fos_complaints.parser import (
+    _is_totals_or_footnote,
+    parse_workbook,
+)
 from problemfinder.sources.protocol import ParsedRecord, RawDocument, SourceParseError, WorkItem
 
 FIXTURE = Path(__file__).parent / "fixtures" / "business-complaints-data-h1-2025.xlsx"
@@ -67,6 +70,18 @@ def test_totals_and_footnote_rows_are_excluded(records: list[ParsedRecord]) -> N
     names = {str(r.fields["business_name"]).lower() for r in records}
     assert not any("total number of complaints" in name for name in names)
     assert not any(name.startswith("*") for name in names)
+
+
+@pytest.mark.parametrize(
+    "label",
+    ["TOTALS", "Total", "Total (45/ 45 Threshold)", "Total of above", "Totals of the above"],
+)
+def test_every_observed_totals_label_is_excluded(label: str) -> None:
+    assert _is_totals_or_footnote(label, None)
+
+
+def test_a_real_firm_named_total_is_kept() -> None:
+    assert not _is_totals_or_footnote("Total Insurance Services Ltd", "No Group")
 
 
 def test_hints_flow_into_every_record(records: list[ParsedRecord]) -> None:

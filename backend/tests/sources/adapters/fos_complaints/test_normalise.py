@@ -57,3 +57,15 @@ def test_no_group_is_normalised_to_none() -> None:
     record = RECORD.model_copy(update={"fields": {**RECORD.fields, "business_group": "No Group"}})
     signal = to_signal("fos_complaints", record, PROVENANCE)
     assert signal.extras["business_group"] is None
+
+
+def test_era_variant_categories_share_one_canonical_label() -> None:
+    for raw in (
+        "General Insurance / Pure Protection (Includes PPI)",
+        "General Insurance / Pure Protection (including PPI)",
+        "General Insurance / Pure Protection",
+    ):
+        record = RECORD.model_copy(update={"fields": {**RECORD.fields, "category": raw}})
+        signal = to_signal("fos_complaints", record, PROVENANCE)
+        assert signal.category == "General Insurance / Pure Protection"
+        assert signal.extras["source_category"] == raw
