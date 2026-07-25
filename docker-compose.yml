@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: problemfinder-postgres
+    environment:
+      POSTGRES_USER: pf
+      POSTGRES_PASSWORD: pf
+      POSTGRES_DB: problemfinder
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pf -d problemfinder"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+
+volumes:
+  pgdata:

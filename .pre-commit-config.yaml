@@ -1,0 +1,47 @@
+# Every gate runs as a local hook against the whole project, so the versions in
+# backend/pyproject.toml and frontend/package.json are the single source of truth.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-format
+        name: ruff format
+        entry: bash -c 'cd backend && uv run ruff format --check .'
+        language: system
+        pass_filenames: false
+        files: \.py$
+      - id: ruff-check
+        name: ruff check
+        entry: bash -c 'cd backend && uv run ruff check .'
+        language: system
+        pass_filenames: false
+        files: \.py$
+      - id: mypy
+        name: mypy --strict
+        entry: bash -c 'cd backend && uv run mypy src tests'
+        language: system
+        pass_filenames: false
+        files: \.py$
+      - id: import-linter
+        name: import-linter layering contract
+        entry: bash -c 'cd backend && uv run lint-imports'
+        language: system
+        pass_filenames: false
+        files: \.py$
+      - id: file-length
+        name: file length ceilings
+        entry: python3 scripts/check_file_length.py
+        language: system
+        pass_filenames: false
+        files: \.(py|ts|tsx)$
+      - id: jscpd
+        name: jscpd duplication check
+        entry: frontend/node_modules/.bin/jscpd --config .jscpd.json
+        language: system
+        pass_filenames: false
+        files: \.(py|ts|tsx)$
+      - id: eslint
+        name: eslint
+        entry: bash -c 'cd frontend && npx eslint src tests'
+        language: system
+        pass_filenames: false
+        files: \.(ts|tsx)$

@@ -1,0 +1,14 @@
+{
+  "pattern": "**/*.{py,ts,tsx}",
+  "path": ["backend/src", "frontend/src"],
+  "ignore": [
+    "**/api/schema.d.ts",
+    "**/routeTree.gen.ts",
+    "**/migrations/versions/**",
+    "**/components/ui/**"
+  ],
+  "minTokens": 50,
+  "threshold": 0,
+  "reporters": ["consoleFull"],
+  "gitignore": true
+}
