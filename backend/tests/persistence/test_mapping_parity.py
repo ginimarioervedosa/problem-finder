@@ -16,7 +16,7 @@ from problemfinder.domain.signal import AggregateSignal, SignalCore, VerbatimSig
 from problemfinder.persistence.orm import RawPayloadRow, SignalRow
 
 PROVENANCE_COLUMNS = {"raw_payload_sha256", "adapter_version", "ingestion_run_id", "fetched_at"}
-PERSISTENCE_ONLY_COLUMNS = {"dedupe_hash"}
+PERSISTENCE_ONLY_COLUMNS = {"dedupe_hash", "search_tsv"}
 
 
 def domain_field_names(*models: type[BaseModel]) -> set[str]:

@@ -10,14 +10,15 @@ Revision ID: 6b940de4d496
 Revises: b9e7867a66a4
 Create Date: 2026-07-25 12:05:10.704062
 """
+
 from collections.abc import Sequence
 
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-revision: str = '6b940de4d496'
-down_revision: str | None = 'b9e7867a66a4'
+revision: str = "6b940de4d496"
+down_revision: str | None = "b9e7867a66a4"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
@@ -50,11 +51,11 @@ WHERE rp.sha256 = s.raw_payload_sha256
 
 
 def upgrade() -> None:
-    op.add_column('raw_payloads', sa.Column('external_id', sa.String(length=256), nullable=True))
+    op.add_column("raw_payloads", sa.Column("external_id", sa.String(length=256), nullable=True))
     op.add_column(
-        'raw_payloads',
+        "raw_payloads",
         sa.Column(
-            'request_hints',
+            "request_hints",
             postgresql.JSONB(astext_type=sa.Text()),
             nullable=False,
             server_default=sa.text("'{}'::jsonb"),
@@ -66,5 +67,5 @@ def upgrade() -> None:
 def downgrade() -> None:
     # Restores the pre-capture schema; the captured work-item metadata is lost,
     # which is exactly what this revision added.
-    op.drop_column('raw_payloads', 'request_hints')
-    op.drop_column('raw_payloads', 'external_id')
+    op.drop_column("raw_payloads", "request_hints")
+    op.drop_column("raw_payloads", "external_id")
