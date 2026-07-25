@@ -14,7 +14,7 @@ def test_register_indexes_an_instance_by_key() -> None:
         assert isinstance(instance, Source)
         assert registry.get("stub") is instance
     finally:
-        del registry._registry["stub"]  # noqa: SLF001
+        del registry._registry["stub"]
 
 
 def test_unknown_key_raises_and_names_known_keys() -> None:

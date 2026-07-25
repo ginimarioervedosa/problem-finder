@@ -26,7 +26,7 @@ STUB_POLICY = SourcePolicy(
     terms_reviewed=date(2026, 7, 1),
     terms_notes="synthetic test source",
     rate_limit=RateLimit(requests=1000, per_seconds=1.0, burst=1000),
-    user_agent="problem-finder-tests",
+    user_agent="problem-finder-tests (contact: tests@example.org)",
 )
 
 
@@ -46,6 +46,8 @@ class StubSource:
 
     async def fetch(self, item: WorkItem) -> RawDocument:
         self.events.append(("fetch", item.external_id))
+        if item.external_id == "boom":
+            raise RuntimeError("synthetic fetch failure")
         return RawDocument(
             work_item=item,
             content=f"payload for {item.external_id}".encode(),
