@@ -89,6 +89,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/theme-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Suggestions */
+        get: operations["suggestions_api_theme_suggestions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/themes": {
         parameters: {
             query?: never;
@@ -325,6 +342,18 @@ export interface components {
             /** Requests */
             requests: number;
         };
+        /** RepresentativeSignal */
+        RepresentativeSignal: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Snippet */
+            snippet: string;
+            /** Title */
+            title: string | null;
+        };
         /**
          * RobotsStatus
          * @enum {string}
@@ -385,6 +414,11 @@ export interface components {
             user_agent: string;
         };
         /**
+         * SuggestionStatus
+         * @enum {string}
+         */
+        SuggestionStatus: "proposed" | "accepted" | "rejected";
+        /**
          * SummaryDimension
          * @enum {string}
          */
@@ -399,6 +433,41 @@ export interface components {
             upheld_share: number | null;
             /** Volume */
             volume: number;
+        };
+        /**
+         * ThemeSuggestionView
+         * @description A suggestion as the dashboard sees it: evidence previews, no id lists.
+         */
+        ThemeSuggestionView: {
+            /** Cluster Key */
+            cluster_key: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Decided At */
+            decided_at: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+            /** Mapped Theme */
+            mapped_theme: string | null;
+            /** Method */
+            method: string;
+            /** Representatives */
+            representatives: components["schemas"]["RepresentativeSignal"][];
+            /** Size */
+            size: number;
+            status: components["schemas"]["SuggestionStatus"];
+            /** Suggested Theme */
+            suggested_theme: string | null;
+            /** Top Terms */
+            top_terms: string[];
         };
         /** TrendPoint */
         TrendPoint: {
@@ -640,6 +709,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SummaryRow"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    suggestions_api_theme_suggestions_get: {
+        parameters: {
+            query?: {
+                status?: components["schemas"]["SuggestionStatus"] | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ThemeSuggestionView"][];
                 };
             };
             /** @description Validation Error */

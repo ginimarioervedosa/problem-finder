@@ -15,7 +15,14 @@ from problemfinder.domain.cursor import Cursor
 from problemfinder.domain.enrichment import SignalEnrichment
 from problemfinder.domain.raw_payload import RawPayloadMeta
 from problemfinder.domain.signal import AggregateSignal, SignalCore, VerbatimSignal
-from problemfinder.persistence.orm import CursorRow, RawPayloadRow, SignalEnrichmentRow, SignalRow
+from problemfinder.domain.theme_suggestion import ThemeSuggestion
+from problemfinder.persistence.orm import (
+    CursorRow,
+    RawPayloadRow,
+    SignalEnrichmentRow,
+    SignalRow,
+    ThemeSuggestionRow,
+)
 
 PROVENANCE_COLUMNS = {"raw_payload_sha256", "adapter_version", "ingestion_run_id", "fetched_at"}
 PERSISTENCE_ONLY_COLUMNS = {"dedupe_hash", "search_tsv"}
@@ -75,3 +82,14 @@ def test_enrichment_field_optionality_matches_column_nullability() -> None:
     for name in SignalEnrichment.model_fields:
         column = SignalEnrichmentRow.__table__.columns[name]
         assert column.nullable == is_optional(SignalEnrichment, name), name
+
+
+def test_suggestion_columns_equal_domain_fields() -> None:
+    actual = {column.name for column in ThemeSuggestionRow.__table__.columns}
+    assert actual == set(ThemeSuggestion.model_fields)
+
+
+def test_suggestion_field_optionality_matches_column_nullability() -> None:
+    for name in ThemeSuggestion.model_fields:
+        column = ThemeSuggestionRow.__table__.columns[name]
+        assert column.nullable == is_optional(ThemeSuggestion, name), name

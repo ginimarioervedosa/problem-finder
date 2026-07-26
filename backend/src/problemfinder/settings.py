@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     archive_dir: Path = REPO_ROOT / "data" / "archive"
     sources_config: Path = REPO_ROOT / "backend" / "config" / "sources.toml"
     taxonomy_path: Path = REPO_ROOT / "backend" / "config" / "taxonomy.yaml"
+    # Derived and disposable ML artefacts (embedding cache); data/ is gitignored.
+    ml_cache_dir: Path = REPO_ROOT / "data" / "ml"
     api_port: int = 8000
     cors_origin: str = "http://localhost:5173"
     # Reddit script-app OAuth credentials; .env only, never committed.

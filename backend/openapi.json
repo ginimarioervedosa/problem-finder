@@ -398,6 +398,37 @@
         "title": "RateLimit",
         "type": "object"
       },
+      "RepresentativeSignal": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "snippet": {
+            "title": "Snippet",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "snippet"
+        ],
+        "title": "RepresentativeSignal",
+        "type": "object"
+      },
       "RobotsStatus": {
         "enum": [
           "allowed",
@@ -533,6 +564,15 @@
         "title": "SourcePolicy",
         "type": "object"
       },
+      "SuggestionStatus": {
+        "enum": [
+          "proposed",
+          "accepted",
+          "rejected"
+        ],
+        "title": "SuggestionStatus",
+        "type": "string"
+      },
       "SummaryDimension": {
         "enum": [
           "category",
@@ -575,6 +615,104 @@
           "upheld_share"
         ],
         "title": "SummaryRow",
+        "type": "object"
+      },
+      "ThemeSuggestionView": {
+        "description": "A suggestion as the dashboard sees it: evidence previews, no id lists.",
+        "properties": {
+          "cluster_key": {
+            "title": "Cluster Key",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "mapped_theme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mapped Theme"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "representatives": {
+            "items": {
+              "$ref": "#/components/schemas/RepresentativeSignal"
+            },
+            "title": "Representatives",
+            "type": "array"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SuggestionStatus"
+          },
+          "suggested_theme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Theme"
+          },
+          "top_terms": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Top Terms",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "cluster_key",
+          "label",
+          "method",
+          "size",
+          "top_terms",
+          "suggested_theme",
+          "status",
+          "mapped_theme",
+          "created_at",
+          "decided_at",
+          "representatives"
+        ],
+        "title": "ThemeSuggestionView",
         "type": "object"
       },
       "TrendPoint": {
@@ -1288,6 +1426,59 @@
         "summary": "Summarise",
         "tags": [
           "summaries"
+        ]
+      }
+    },
+    "/api/theme-suggestions": {
+      "get": {
+        "operationId": "suggestions_api_theme_suggestions_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SuggestionStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ThemeSuggestionView"
+                  },
+                  "title": "Response Suggestions Api Theme Suggestions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Suggestions",
+        "tags": [
+          "theme-suggestions"
         ]
       }
     },

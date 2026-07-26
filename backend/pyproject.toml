@@ -21,6 +21,15 @@ dependencies = [
     "pyyaml>=6.0.3",
 ]
 
+[project.optional-dependencies]
+# The zero-ML guarantee: the core app installs and runs without any of these.
+# CI runs `uv sync` with no extras and the full suite passes; install locally
+# with `uv sync --extra ml` to enable `pf ml cluster`.
+ml = [
+    "sentence-transformers>=3.3",
+    "scikit-learn>=1.6",
+]
+
 [project.scripts]
 pf = "problemfinder.cli.main:app"
 
@@ -66,6 +75,9 @@ max-complexity = 10
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["PLR0913"]
+# Function-level imports ARE the ml extras boundary: heavyweight packages load
+# lazily so the core install imports every module without them.
+"src/problemfinder/enrichment/ml/*" = ["PLC0415"]
 
 [tool.mypy]
 strict = true
@@ -80,6 +92,17 @@ warn_unreachable = true
 # APScheduler 3.x ships no py.typed marker; its call sites here are thin and
 # covered by tests/worker, so untyped imports are accepted for this module only.
 module = "apscheduler.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# The ml extras group is absent in the zero-ML CI environment, so mypy must
+# not require these packages to exist. sklearn ships no py.typed marker
+# anyway; numpy's real stubs still apply wherever the extras are installed.
+module = [
+    "sentence_transformers", "sentence_transformers.*",
+    "sklearn", "sklearn.*",
+    "numpy", "numpy.*",
+]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
@@ -120,11 +143,34 @@ source_modules = [
     "problemfinder.enrichment.taxonomy",
     "problemfinder.enrichment.ruleset",
     "problemfinder.enrichment.derive",
+    "problemfinder.enrichment.ml.embeddings",
+    "problemfinder.enrichment.ml.cluster",
+    "problemfinder.enrichment.ml.terms",
+    "problemfinder.enrichment.ml.match",
 ]
 forbidden_modules = [
     "problemfinder.persistence", "problemfinder.sources", "problemfinder.settings",
     "sqlalchemy",
 ]
+
+# The zero-ML guarantee, mechanically: no module outside enrichment.ml may
+# import an ML library directly (indirect chains through enrichment.ml are
+# the design). That the imports inside enrichment.ml stay lazy is enforced
+# at runtime by tests/enrichment/test_zero_ml_core.py and by CI installing
+# no extras.
+[[tool.importlinter.contracts]]
+name = "ML libraries stay inside enrichment.ml"
+type = "forbidden"
+allow_indirect_imports = true
+source_modules = [
+    "problemfinder.domain", "problemfinder.persistence", "problemfinder.sources",
+    "problemfinder.ingestion", "problemfinder.queries", "problemfinder.api",
+    "problemfinder.cli", "problemfinder.worker",
+    "problemfinder.enrichment.passes", "problemfinder.enrichment.protocol",
+    "problemfinder.enrichment.taxonomy", "problemfinder.enrichment.ruleset",
+    "problemfinder.enrichment.derive", "problemfinder.enrichment.run",
+]
+forbidden_modules = ["sentence_transformers", "sklearn", "torch", "numpy"]
 
 [[tool.importlinter.contracts]]
 name = "Domain purity"

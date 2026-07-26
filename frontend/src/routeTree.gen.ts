@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RunsRouteImport } from './routes/runs'
 import { Route as SignalsRouteImport } from './routes/signals'
+import { Route as SuggestionsRouteImport } from './routes/suggestions'
 import { Route as ThemesRouteImport } from './routes/themes'
 import { Route as TrendsRouteImport } from './routes/trends'
 
@@ -30,6 +31,11 @@ const SignalsRoute = SignalsRouteImport.update({
   path: '/signals',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuggestionsRoute = SuggestionsRouteImport.update({
+  id: '/suggestions',
+  path: '/suggestions',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ThemesRoute = ThemesRouteImport.update({
   id: '/themes',
   path: '/themes',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/runs': typeof RunsRoute
   '/signals': typeof SignalsRoute
+  '/suggestions': typeof SuggestionsRoute
   '/themes': typeof ThemesRoute
   '/trends': typeof TrendsRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/runs': typeof RunsRoute
   '/signals': typeof SignalsRoute
+  '/suggestions': typeof SuggestionsRoute
   '/themes': typeof ThemesRoute
   '/trends': typeof TrendsRoute
 }
@@ -60,21 +68,30 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/runs': typeof RunsRoute
   '/signals': typeof SignalsRoute
+  '/suggestions': typeof SuggestionsRoute
   '/themes': typeof ThemesRoute
   '/trends': typeof TrendsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/runs' | '/signals' | '/themes' | '/trends'
+  fullPaths: '/' | '/runs' | '/signals' | '/suggestions' | '/themes' | '/trends'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/runs' | '/signals' | '/themes' | '/trends'
-  id: '__root__' | '/' | '/runs' | '/signals' | '/themes' | '/trends'
+  to: '/' | '/runs' | '/signals' | '/suggestions' | '/themes' | '/trends'
+  id:
+    | '__root__'
+    | '/'
+    | '/runs'
+    | '/signals'
+    | '/suggestions'
+    | '/themes'
+    | '/trends'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   RunsRoute: typeof RunsRoute
   SignalsRoute: typeof SignalsRoute
+  SuggestionsRoute: typeof SuggestionsRoute
   ThemesRoute: typeof ThemesRoute
   TrendsRoute: typeof TrendsRoute
 }
@@ -102,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignalsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/suggestions': {
+      id: '/suggestions'
+      path: '/suggestions'
+      fullPath: '/suggestions'
+      preLoaderRoute: typeof SuggestionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/themes': {
       id: '/themes'
       path: '/themes'
@@ -123,6 +147,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   RunsRoute: RunsRoute,
   SignalsRoute: SignalsRoute,
+  SuggestionsRoute: SuggestionsRoute,
   ThemesRoute: ThemesRoute,
   TrendsRoute: TrendsRoute,
 }
