@@ -153,12 +153,15 @@ forbidden_modules = [
     "sqlalchemy",
 ]
 
-# The zero-ML guarantee, mechanically: ML libraries exist only inside
-# problemfinder.enrichment.ml, and only behind lazy imports there, so the
-# core install never needs the ml extras group.
+# The zero-ML guarantee, mechanically: no module outside enrichment.ml may
+# import an ML library directly (indirect chains through enrichment.ml are
+# the design). That the imports inside enrichment.ml stay lazy is enforced
+# at runtime by tests/enrichment/test_zero_ml_core.py and by CI installing
+# no extras.
 [[tool.importlinter.contracts]]
 name = "ML libraries stay inside enrichment.ml"
 type = "forbidden"
+allow_indirect_imports = true
 source_modules = [
     "problemfinder.domain", "problemfinder.persistence", "problemfinder.sources",
     "problemfinder.ingestion", "problemfinder.queries", "problemfinder.api",
