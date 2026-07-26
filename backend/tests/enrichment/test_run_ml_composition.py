@@ -57,30 +57,31 @@ def latest_by_external_id(*signals: VerbatimSignal) -> dict[str, tuple[str | Non
     return {s.external_id: (latest[s.id].theme, latest[s.id].method) for s in signals}
 
 
-def test_accepted_mappings_fill_gaps_and_compose_the_method(
+def test_accepted_mappings_theme_their_members_and_compose_the_method(
     corpus: tuple[VerbatimSignal, VerbatimSignal],
 ) -> None:
     ruled, unruled = corpus
-    accept_cluster_over(ruled, unruled, theme="transfer_delays")
+    accept_cluster_over(unruled, theme="transfer_delays")
 
     first = run_enrichment()
     assert first.written == 2
     rows = latest_by_external_id(ruled, unruled)
-    assert rows["ruled"] == ("fraud_and_scams", "rules:v1")  # rules keep authority
+    assert rows["ruled"] == ("fraud_and_scams", "rules:v1")  # outside the cluster: rules
     assert rows["unruled"] == ("transfer_delays", "rules:v1+hdbscan:v1")
 
     second = run_enrichment(recompute=True)
     assert (second.written, second.unchanged) == (0, 2)
 
 
-def test_a_new_acceptance_rewrites_only_the_signals_it_themes(
+def test_a_new_acceptance_overrides_keyword_themes_for_its_members_only(
     corpus: tuple[VerbatimSignal, VerbatimSignal],
 ) -> None:
     ruled, unruled = corpus
     run_enrichment()
-    accept_cluster_over(ruled, unruled, theme="transfer_delays")
+    accept_cluster_over(ruled, theme="transfer_delays")  # reviewed decision beats keywords
 
     report = run_enrichment(recompute=True)
-    assert (report.written, report.unchanged) == (1, 1)  # the ruled signal never changed
-    theme, method = latest_by_external_id(unruled)["unruled"]
-    assert (theme, method) == ("transfer_delays", "rules:v1+hdbscan:v1")
+    assert (report.written, report.unchanged) == (1, 1)  # only the member was rewritten
+    rows = latest_by_external_id(ruled, unruled)
+    assert rows["ruled"] == ("transfer_delays", "rules:v1+hdbscan:v1")
+    assert rows["unruled"] == (None, "rules:v1")

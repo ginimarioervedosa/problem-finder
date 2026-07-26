@@ -1,10 +1,14 @@
 """Accepted cluster mappings, folded in as one more enrichment pass.
 
-The pass runs after the rules and fills the theme only where they left
-none: reviewed keyword rules stay authoritative, clustering extends their
-reach. It is pure over domain models; the assignments arrive as data (built
-from accepted theme suggestions), never from storage or an ML library, so
-enrichment with ML-derived themes runs fine on a zero-ML install.
+The pass runs after the rules and sets its members' theme outright: an
+accepted mapping is a human-reviewed decision about what those signals are
+about, which outranks a keyword coincidence (long decision texts trip
+generic keywords constantly — the first live cluster, dental aligners, was
+100% rule-tagged as payment disputes). Rules keep every other attribute,
+and every signal outside an accepted cluster. The pass is pure over domain
+models; assignments arrive as data built from accepted theme suggestions,
+never from storage or an ML library, so enrichment with ML-derived themes
+runs fine on a zero-ML install.
 """
 
 from collections.abc import Mapping
@@ -16,7 +20,7 @@ from problemfinder.enrichment.protocol import EnrichmentDraft
 
 
 class MlThemeAssignmentPass:
-    """Fill unthemed signals from accepted cluster mappings, recording which."""
+    """Carry accepted cluster mappings onto their members, recording which."""
 
     name = "ml_theme_assignment"
 
@@ -26,8 +30,10 @@ class MlThemeAssignmentPass:
 
     def apply(self, signal: ProblemSignal, draft: EnrichmentDraft) -> None:
         assignment = self._assignments.get(signal.id)
-        if assignment is None or draft.theme is not None:
+        if assignment is None:
             return
+        if draft.theme != assignment.theme:
+            draft.sub_theme = None  # a sub-theme of a replaced theme cannot survive it
         draft.theme = assignment.theme
         self._applied.add(signal.id)
 

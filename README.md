@@ -179,7 +179,9 @@ cd backend && uv run pf ml reject 7
 cd backend && uv run pf enrich run --recompute   # carry accepted mappings into enrichment
 ```
 
-Accepted mappings fill themes only where the keyword rules found none, and the
-affected rows record an honest composed method (`rules:v1+hdbscan:v1`). Reclustering
-replaces undecided proposals and keeps decisions; everything remains recomputable
-from stored signals, so ML artefacts are disposable by design.
+An accepted mapping is a reviewed decision, so it sets its member signals' theme
+outright (long decision texts trip generic keywords constantly; the reviewed cluster
+outranks the coincidence), and the affected rows record an honest composed method
+(`rules:v1+hdbscan:v1`). Rules keep every other attribute and every unclustered
+signal. Reclustering replaces undecided proposals and keeps decisions; everything
+remains recomputable from stored signals, so ML artefacts are disposable by design.
