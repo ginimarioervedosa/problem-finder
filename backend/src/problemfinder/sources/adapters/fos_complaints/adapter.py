@@ -1,10 +1,8 @@
 """The FOS complaints adapter: policy declaration and the four pipeline stages."""
 
 from collections.abc import AsyncIterator, Iterator, Sequence
-from datetime import UTC, date, datetime
+from datetime import date
 from typing import ClassVar
-
-from pydantic import JsonValue
 
 from problemfinder.domain.cursor import Cursor
 from problemfinder.domain.provenance import Provenance
@@ -18,12 +16,14 @@ from problemfinder.domain.source_policy import (
 from problemfinder.sources.adapters.fos_complaints.discover import discover_releases
 from problemfinder.sources.adapters.fos_complaints.normalise import to_signal
 from problemfinder.sources.adapters.fos_complaints.parser import parse_workbook
+from problemfinder.sources.cursor_state import fold_ingested_keys, ingested_keys
 from problemfinder.sources.fetch import fetch_one
 from problemfinder.sources.http import IDENTIFYING_USER_AGENT, client_for
 from problemfinder.sources.protocol import ParsedRecord, RawDocument, WorkItem
 from problemfinder.sources.registry import register
 
 _XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+_STATE_KEY = "ingested_periods"
 
 
 @register
@@ -45,7 +45,7 @@ class FosComplaintsSource:
     )
 
     async def discover(self, cursor: Cursor | None) -> AsyncIterator[WorkItem]:
-        seen = _ingested_periods(cursor)
+        seen = ingested_keys(cursor, _STATE_KEY)
         async with client_for(self.key, self.policy) as client:
             for item in await discover_releases(client):
                 if item.external_id not in seen:
@@ -61,19 +61,4 @@ class FosComplaintsSource:
         return to_signal(self.key, record, provenance)
 
     def cursor_after(self, cursor: Cursor | None, done: Sequence[WorkItem]) -> Cursor:
-        merged = _ingested_periods(cursor) | {item.external_id for item in done}
-        periods: list[JsonValue] = []
-        periods.extend(sorted(merged))
-        return Cursor(
-            source_key=self.key,
-            state={"ingested_periods": periods},
-            updated_at=datetime.now(tz=UTC),
-        )
-
-
-def _ingested_periods(cursor: Cursor | None) -> set[str]:
-    """Half-year period keys already ingested, out of the cursor's state."""
-    if cursor is None:
-        return set()
-    periods = cursor.state.get("ingested_periods")
-    return {str(period) for period in periods} if isinstance(periods, list) else set()
+        return fold_ingested_keys(self.key, cursor, _STATE_KEY, done)
