@@ -156,3 +156,30 @@ cd backend && uv run pf enrich run --recompute  # rebuild every derived attribut
 Recompute appends a new version per signal and only where the derived attributes
 actually changed, so running it twice writes nothing the second time. Every row
 records the method that produced it (`rules:v1`) alongside its version.
+
+## Proposing new themes with ML (optional)
+
+The core install carries zero ML dependencies; CI proves it by installing without
+extras and running the full suite. To enable clustering, install the extras group:
+
+```bash
+cd backend && uv sync --extra ml
+```
+
+Clustering embeds every verbatim signal locally (sentence-transformers MiniLM,
+cached under the gitignored `data/ml/`), groups them with HDBSCAN, and proposes
+candidate themes with their distinctive terms and closest taxonomy match. Proposals
+appear on the dashboard's Suggestions page; the review decision is yours, from the CLI:
+
+```bash
+cd backend && uv run pf ml cluster        # embed, cluster, propose
+cd backend && uv run pf ml suggestions    # list proposals and their review state
+cd backend && uv run pf ml accept 3 --theme mis_selling_and_advice
+cd backend && uv run pf ml reject 7
+cd backend && uv run pf enrich run --recompute   # carry accepted mappings into enrichment
+```
+
+Accepted mappings fill themes only where the keyword rules found none, and the
+affected rows record an honest composed method (`rules:v1+hdbscan:v1`). Reclustering
+replaces undecided proposals and keeps decisions; everything remains recomputable
+from stored signals, so ML artefacts are disposable by design.
