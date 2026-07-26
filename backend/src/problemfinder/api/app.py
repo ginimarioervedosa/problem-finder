@@ -3,7 +3,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from problemfinder.api.routers import runs, signals, sources, summaries, themes, trends
+from problemfinder.api.routers import (
+    runs,
+    signals,
+    sources,
+    summaries,
+    theme_suggestions,
+    themes,
+    trends,
+)
 from problemfinder.settings import get_settings
 
 
@@ -21,6 +29,7 @@ def create_app() -> FastAPI:
     app.include_router(signals.router)
     app.include_router(summaries.router)
     app.include_router(themes.router)
+    app.include_router(theme_suggestions.router)
     app.include_router(trends.router)
     app.include_router(sources.router)
     app.include_router(runs.router)
