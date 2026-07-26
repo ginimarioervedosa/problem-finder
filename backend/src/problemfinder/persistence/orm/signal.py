@@ -32,11 +32,13 @@ class SignalRow(Base):
     body: Mapped[str] = mapped_column(Text)
     language: Mapped[str] = mapped_column(String(16))
     firm_name: Mapped[str | None] = mapped_column(String(256), index=True)
-    category: Mapped[str | None] = mapped_column(String(128), index=True)
+    # Text, not a guessed cap: committee inquiry titles and joint-author
+    # handles exceed 128 and the domain model imposes no length.
+    category: Mapped[str | None] = mapped_column(Text, index=True)
     extras: Mapped[dict[str, object]] = mapped_column(JSONB)
 
     # verbatim-only
-    author_handle: Mapped[str | None] = mapped_column(String(128))
+    author_handle: Mapped[str | None] = mapped_column(Text)
 
     # aggregate-only
     period_start: Mapped[date | None]
