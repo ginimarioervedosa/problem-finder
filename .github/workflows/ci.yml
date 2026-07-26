@@ -24,6 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
+      # No --extra ml, deliberately: the zero-ML guarantee is that the core
+      # install passes the entire gate set. ML-dependent tests skip visibly.
       - run: uv sync
         working-directory: backend
       - run: uv run ruff format --check .
