@@ -11,7 +11,14 @@ from problemfinder.domain.identity import content_fingerprint
 from problemfinder.domain.ingestion_run import IngestionRun
 from problemfinder.domain.provenance import Provenance
 from problemfinder.domain.signal import AggregateSignal, SignalKind, VerbatimSignal
-from problemfinder.persistence.orm import CursorRow, IngestionRunRow, SignalEnrichmentRow, SignalRow
+from problemfinder.domain.theme_suggestion import ThemeSuggestion
+from problemfinder.persistence.orm import (
+    CursorRow,
+    IngestionRunRow,
+    SignalEnrichmentRow,
+    SignalRow,
+    ThemeSuggestionRow,
+)
 
 type AnySignal = VerbatimSignal | AggregateSignal
 
@@ -92,6 +99,21 @@ def enrichment_to_values(enrichment: SignalEnrichment) -> dict[str, object]:
 def row_to_enrichment(row: SignalEnrichmentRow) -> SignalEnrichment:
     return SignalEnrichment.model_validate(
         {name: getattr(row, name) for name in SignalEnrichment.model_fields}
+    )
+
+
+def suggestion_to_values(suggestion: ThemeSuggestion) -> dict[str, object]:
+    """Column values for one suggestion; UUID members serialise to JSONB strings."""
+    values: dict[str, object] = suggestion.model_dump(mode="json")
+    values["id"] = suggestion.id  # UUID column, not JSONB
+    values["created_at"] = suggestion.created_at  # DateTime columns, not JSONB
+    values["decided_at"] = suggestion.decided_at
+    return values
+
+
+def row_to_suggestion(row: ThemeSuggestionRow) -> ThemeSuggestion:
+    return ThemeSuggestion.model_validate(
+        {name: getattr(row, name) for name in ThemeSuggestion.model_fields}
     )
 
 

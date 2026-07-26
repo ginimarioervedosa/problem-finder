@@ -7,6 +7,7 @@ from problemfinder.domain.enrichment import SignalEnrichment
 from problemfinder.domain.identity import signal_id_for
 from problemfinder.domain.provenance import Provenance
 from problemfinder.domain.signal import AggregateSignal, VerbatimSignal
+from problemfinder.domain.theme_suggestion import ThemeSuggestion
 
 
 def build_provenance() -> Provenance:
@@ -50,6 +51,24 @@ def build_enrichment(signal_id: UUID, **overrides: object) -> SignalEnrichment:
     }
     payload.update(overrides)
     return SignalEnrichment.model_validate(payload)
+
+
+def build_suggestion(**overrides: object) -> ThemeSuggestion:
+    member_ids = (uuid4(), uuid4(), uuid4())
+    payload: dict[str, object] = {
+        "id": uuid4(),
+        "method": "hdbscan:v1",
+        "cluster_key": 0,
+        "label": "transfer_delay_pension",
+        "top_terms": ("transfer", "delay", "pension"),
+        "size": len(member_ids),
+        "member_signal_ids": member_ids,
+        "representative_signal_ids": member_ids[:2],
+        "suggested_theme": "delays_and_service_failures",
+        "created_at": datetime(2026, 7, 25, tzinfo=UTC),
+    }
+    payload.update(overrides)
+    return ThemeSuggestion.model_validate(payload)
 
 
 def build_verbatim(**overrides: object) -> VerbatimSignal:

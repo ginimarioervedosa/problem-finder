@@ -6,8 +6,14 @@ from uuid import uuid4
 from problemfinder.domain.identity import signal_id_for
 from problemfinder.domain.provenance import Provenance
 from problemfinder.domain.signal import AggregateSignal, VerbatimSignal
-from problemfinder.persistence.mapping import row_to_signal, signal_to_values
-from problemfinder.persistence.orm import SignalRow
+from problemfinder.persistence.mapping import (
+    row_to_signal,
+    row_to_suggestion,
+    signal_to_values,
+    suggestion_to_values,
+)
+from problemfinder.persistence.orm import SignalRow, ThemeSuggestionRow
+from tests.support.builders import build_suggestion
 
 PROVENANCE = Provenance(
     raw_payload_sha256="b" * 64,
@@ -37,6 +43,11 @@ def test_aggregate_round_trip() -> None:
         provenance=PROVENANCE,
     )
     assert row_to_signal(SignalRow(**signal_to_values(signal))) == signal
+
+
+def test_suggestion_round_trip() -> None:
+    suggestion = build_suggestion()
+    assert row_to_suggestion(ThemeSuggestionRow(**suggestion_to_values(suggestion))) == suggestion
 
 
 def test_verbatim_round_trip() -> None:
