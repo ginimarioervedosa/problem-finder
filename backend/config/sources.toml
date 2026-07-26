@@ -17,6 +17,11 @@ schedule = "0 7 * * 2"
 window_from = 2025-01-01
 window_to = 2025-06-30
 
+# Annual reports appear once a year; a weekly check is plenty.
+[sources.adjudicators_office]
+enabled = true
+schedule = "0 7 * * 3"
+
 # Disabled until OAuth credentials exist in .env (PF_REDDIT_CLIENT_ID /
 # PF_REDDIT_CLIENT_SECRET). The subreddit list is a starting proposal; edit freely.
 [sources.reddit]
