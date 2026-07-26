@@ -22,6 +22,17 @@ window_to = 2025-06-30
 enabled = true
 schedule = "0 7 * * 3"
 
+# Written evidence to select committee inquiries via the official
+# committees API. Default committee 158 is the Treasury Committee; add ids
+# to widen. window_from bounds the first backfill.
+[sources.committee_evidence]
+enabled = true
+schedule = "0 8 * * 5"
+
+[sources.committee_evidence.options]
+committee_ids = [158]
+window_from = 2025-01-01
+
 # The decision-data CSV is re-uploaded cumulatively every few months.
 [sources.leo_decisions]
 enabled = true
