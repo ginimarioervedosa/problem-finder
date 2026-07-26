@@ -34,7 +34,7 @@ class SuggestReport(BaseModel):
     replaced: int
 
 
-def propose_themes(*, min_cluster_size: int = 15, encoder: Encoder | None = None) -> SuggestReport:
+def propose_themes(*, min_cluster_size: int = 30, encoder: Encoder | None = None) -> SuggestReport:
     """Cluster every stored verbatim into fresh proposed theme suggestions."""
     settings = get_settings()
     taxonomy = load_taxonomy(settings.taxonomy_path)

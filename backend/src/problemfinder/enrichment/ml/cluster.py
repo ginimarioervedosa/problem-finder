@@ -1,9 +1,14 @@
-"""Density clustering over embeddings: normalise, reduce, HDBSCAN.
+"""Density clustering over embeddings: normalise, reduce hard, HDBSCAN.
 
-Embeddings are L2-normalised so euclidean distance tracks cosine, reduced
-with PCA because HDBSCAN degrades in hundreds of dimensions, then clustered.
-The label -1 is HDBSCAN's noise bucket: signals that belong to no dense
-cluster, deliberately left unproposed. Every step is deterministic.
+Embeddings are L2-normalised so euclidean distance tracks cosine, then
+reduced aggressively (PCA to 5 dimensions): sentence embeddings of
+formulaic decision texts form one dense continuum, and density contrast
+only appears after strong reduction — PCA at 50 dimensions merged 14k real
+decisions into a single blob. min_samples is capped below min_cluster_size
+for the same reason: gentler density smoothing splits the continuum where
+heavier smoothing would swallow it. The label -1 is HDBSCAN's noise bucket:
+signals in no dense cluster, deliberately left unproposed. Every step is
+deterministic.
 """
 
 from __future__ import annotations
@@ -15,10 +20,11 @@ from problemfinder.enrichment.ml.optional import MlExtrasMissingError
 if TYPE_CHECKING:
     import numpy as np
 
-_PCA_COMPONENTS = 50
+_PCA_COMPONENTS = 5
+_MAX_MIN_SAMPLES = 10
 
 
-def cluster_embeddings(matrix: np.ndarray, *, min_cluster_size: int = 15) -> list[int]:
+def cluster_embeddings(matrix: np.ndarray, *, min_cluster_size: int = 30) -> list[int]:
     """One cluster label per row; -1 marks noise."""
     try:
         from sklearn.cluster import HDBSCAN
@@ -29,7 +35,10 @@ def cluster_embeddings(matrix: np.ndarray, *, min_cluster_size: int = 15) -> lis
 
     components = min(_PCA_COMPONENTS, matrix.shape[0], matrix.shape[1])
     reduced = PCA(n_components=components, random_state=0).fit_transform(normalize(matrix))
-    labels = HDBSCAN(min_cluster_size=min_cluster_size).fit_predict(reduced)
+    labels = HDBSCAN(
+        min_cluster_size=min_cluster_size,
+        min_samples=min(min_cluster_size, _MAX_MIN_SAMPLES),
+    ).fit_predict(reduced)
     return [int(label) for label in labels]
 
 

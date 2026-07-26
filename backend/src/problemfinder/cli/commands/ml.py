@@ -17,7 +17,7 @@ app = typer.Typer(no_args_is_help=True)
 def cluster(
     min_cluster_size: Annotated[
         int, typer.Option("--min-cluster-size", min=2, help="Smallest cluster worth proposing")
-    ] = 15,
+    ] = 30,
 ) -> None:
     """Embed every verbatim signal and propose candidate themes."""
     try:
