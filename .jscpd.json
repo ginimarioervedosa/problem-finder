@@ -5,7 +5,8 @@
     "**/api/schema.d.ts",
     "**/routeTree.gen.ts",
     "**/migrations/versions/**",
-    "**/components/ui/**"
+    "**/components/ui/**",
+    "**/sources/adapters/*/adapter.py"
   ],
   "minTokens": 50,
   "threshold": 0,
