@@ -41,7 +41,14 @@ inquiries capture much of that material, but regulator consultation
 responses (FCA/HMT) have no single lawful bulk source and need a scoping
 decision before any further adapter.
 
-## Blocked pending the owner's decision
+## Resolved by the owner, 2026-07-27
+
+The three verdicts below were put to the owner at the phase 6 review pause
+and decided on 2026-07-27: FCA complaints returns proceeds with the residual
+risk accepted (the fos_decisions pattern), Find Case Law is parked without a
+licence application, and the iTunes reviews feed is declared `official_api`
+on the purposive reading. The two proceeding sources are built; their
+`SourcePolicy.terms_notes` restate the acceptance.
 
 ### fca_complaints_returns — judgement call: OGL grant vs anti-bot clause
 
@@ -64,9 +71,10 @@ OGL-licensed files with an identifying user agent is plainly the intended
 use of published open data, and could not engage the "unreasonable burden"
 clause; but clause 4.8(iii) read literally catches any scripted GET. This is
 the same terms-versus-practice tension the owner accepted for fos_decisions
-("proceed, record the risk", 2026-07-25). Awaiting the owner's decision
-before building. Download verified working (2025-H2 firm-level XLSX, 114 KB;
-history to 2013 enumerable from one robots-clean page).
+("proceed, record the risk", 2026-07-25). Download verified working (2025-H2
+firm-level XLSX, 114 KB; history to 2013 enumerable from one robots-clean
+page). **Owner decision 2026-07-27: risk accepted, proceed.** Method: bulk
+download.
 
 ### tribunal_decisions (TNA Find Case Law) — licence application required
 
@@ -83,7 +91,9 @@ to apply"; contact caselawlicence@nationalarchives.gov.uk). robots.txt
 allows general agents (the named disallows target AI-training crawlers).
 Verdict: do not build under the OJL alone. Options: the owner applies for
 the free licence, or the source is parked. Never BAILII (its terms prohibit
-harvesting; plan 1f).
+harvesting; plan 1f). **Owner decision 2026-07-27: parked, no licence
+application.** Revisit only if the owner later applies and the licence is
+granted.
 
 ### app_store_reviews (iTunes RSS) — judgement call: robots disallow on the feed path
 
@@ -94,9 +104,9 @@ hard-blocks robots-DISALLOWED only for scrape and bulk-download methods; an
 `official_api` declaration would pass mechanically. The purposive reading is
 that the robots disallow aims at search-engine indexing of feed pages, not
 at feed consumption (feeds exist to be polled); the literal reading is that
-Apple disallows automated access to those paths. Awaiting the owner's
-decision: declare `official_api` with the risk recorded, or park as
-manual-import-only.
+Apple disallows automated access to those paths. **Owner decision
+2026-07-27: declared `official_api` on the purposive reading, robots status
+recorded DISALLOWED honestly in the policy.** Method: official API.
 
 ## Manual-import-only (gate fails, plan 1g expectation confirmed)
 

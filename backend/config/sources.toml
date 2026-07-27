@@ -38,6 +38,12 @@ window_from = 2025-01-01
 enabled = true
 schedule = "0 7 * * 4"
 
+# Releases land twice a year (spring and autumn); a weekly check is plenty.
+# Owner accepted the residual terms risk 2026-07-27 (see the adapter's policy).
+[sources.fca_complaints_returns]
+enabled = true
+schedule = "0 7 * * 4"
+
 # Disabled until OAuth credentials exist in .env (PF_REDDIT_CLIENT_ID /
 # PF_REDDIT_CLIENT_SECRET). The subreddit list is a starting proposal; edit freely.
 [sources.reddit]
