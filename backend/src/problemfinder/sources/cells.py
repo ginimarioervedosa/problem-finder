@@ -1,4 +1,4 @@
-"""Cell coercion for the FOS workbooks: strings, counts, and shares."""
+"""Cell coercion for spreadsheet sources: strings, counts, and shares."""
 
 import re
 
