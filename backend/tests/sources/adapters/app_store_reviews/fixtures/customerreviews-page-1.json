@@ -1,0 +1,268 @@
+{
+ "feed": {
+  "author": {
+   "name": {
+    "label": "iTunes Store"
+   },
+   "uri": {
+    "label": "http://www.apple.com/uk/itunes/"
+   }
+  },
+  "entry": [
+   {
+    "author": {
+     "uri": {
+      "label": "https://itunes.apple.com/gb/reviews/id637592339"
+     },
+     "name": {
+      "label": "Oznom2026@"
+     },
+     "label": ""
+    },
+    "updated": {
+     "label": "2026-07-25T10:17:29-07:00"
+    },
+    "im:rating": {
+     "label": "5"
+    },
+    "im:version": {
+     "label": "7.36.0"
+    },
+    "id": {
+     "label": "14347220497"
+    },
+    "title": {
+     "label": "Best bank ever"
+    },
+    "content": {
+     "label": "The best bank ever. Only wish they did more than just three months BNPL interest free",
+     "attributes": {
+      "type": "text"
+     }
+    },
+    "link": {
+     "attributes": {
+      "rel": "related",
+      "href": "https://itunes.apple.com/gb/review?id=1052238659&type=Purple%20Software"
+     }
+    },
+    "im:voteSum": {
+     "label": "0"
+    },
+    "im:contentType": {
+     "attributes": {
+      "term": "Application",
+      "label": "Application"
+     }
+    },
+    "im:voteCount": {
+     "label": "0"
+    }
+   },
+   {
+    "author": {
+     "uri": {
+      "label": "https://itunes.apple.com/gb/reviews/id1165006306"
+     },
+     "name": {
+      "label": "NCX_V1p3R"
+     },
+     "label": ""
+    },
+    "updated": {
+     "label": "2026-07-25T09:56:22-07:00"
+    },
+    "im:rating": {
+     "label": "1"
+    },
+    "im:version": {
+     "label": "7.36.0"
+    },
+    "id": {
+     "label": "14347153757"
+    },
+    "title": {
+     "label": "Absolute trash"
+    },
+    "content": {
+     "label": "Went out to the shops, added mileage onto my vehicle and inconvenienced myself so I could grab quick groceries and all of a sudden had to turn round once I arrived because nothing on the app would load, couldn\u2019t get any of my money out of my savings pot, no matter where I went the problem wasn\u2019t to do with signal or network issues, the app just simply wouldn\u2019t work, this isn\u2019t the first time something like this has happened either, the amount of bugs and issues in this app is ridiculous for simply trying to access my own money, I\u2019ll be switching banking apps immediately and this is a final straw considering I\u2019ve been with Monzo for coming on 3 years now. Sort your app out.",
+     "attributes": {
+      "type": "text"
+     }
+    },
+    "link": {
+     "attributes": {
+      "rel": "related",
+      "href": "https://itunes.apple.com/gb/review?id=1052238659&type=Purple%20Software"
+     }
+    },
+    "im:voteSum": {
+     "label": "0"
+    },
+    "im:contentType": {
+     "attributes": {
+      "term": "Application",
+      "label": "Application"
+     }
+    },
+    "im:voteCount": {
+     "label": "0"
+    }
+   },
+   {
+    "author": {
+     "uri": {
+      "label": "https://itunes.apple.com/gb/reviews/id1708001895"
+     },
+     "name": {
+      "label": "Kingsman fend"
+     },
+     "label": ""
+    },
+    "updated": {
+     "label": "2026-07-25T08:15:13-07:00"
+    },
+    "im:rating": {
+     "label": "1"
+    },
+    "im:version": {
+     "label": "7.36.0"
+    },
+    "id": {
+     "label": "14346817736"
+    },
+    "title": {
+     "label": "Eli"
+    },
+    "content": {
+     "label": "Brooo I have been tryna log in for so long and she. I try to chat it never responds it thinks I\u2019m ai",
+     "attributes": {
+      "type": "text"
+     }
+    },
+    "link": {
+     "attributes": {
+      "rel": "related",
+      "href": "https://itunes.apple.com/gb/review?id=1052238659&type=Purple%20Software"
+     }
+    },
+    "im:voteSum": {
+     "label": "0"
+    },
+    "im:contentType": {
+     "attributes": {
+      "term": "Application",
+      "label": "Application"
+     }
+    },
+    "im:voteCount": {
+     "label": "0"
+    }
+   },
+   {
+    "author": {
+     "uri": {
+      "label": "https://itunes.apple.com/gb/reviews/id1850507948"
+     },
+     "name": {
+      "label": "Hanifah sh"
+     },
+     "label": ""
+    },
+    "updated": {
+     "label": "2026-07-24T14:46:03-07:00"
+    },
+    "im:rating": {
+     "label": "5"
+    },
+    "im:version": {
+     "label": "7.36.0"
+    },
+    "id": {
+     "label": "14344041545"
+    },
+    "title": {
+     "label": "Why it\u2019s good"
+    },
+    "content": {
+     "label": "I love it it\u2019s the best my under 16s card is the best and it doesn\u2019t even break I give this 500 stars",
+     "attributes": {
+      "type": "text"
+     }
+    },
+    "link": {
+     "attributes": {
+      "rel": "related",
+      "href": "https://itunes.apple.com/gb/review?id=1052238659&type=Purple%20Software"
+     }
+    },
+    "im:voteSum": {
+     "label": "0"
+    },
+    "im:contentType": {
+     "attributes": {
+      "term": "Application",
+      "label": "Application"
+     }
+    },
+    "im:voteCount": {
+     "label": "0"
+    }
+   }
+  ],
+  "updated": {
+   "label": "2026-07-27T03:06:31-07:00"
+  },
+  "rights": {
+   "label": "Copyright 2008 Apple Inc."
+  },
+  "title": {
+   "label": "iTunes Store: Customer Reviews"
+  },
+  "icon": {
+   "label": "http://itunes.apple.com/favicon.ico"
+  },
+  "link": [
+   {
+    "attributes": {
+     "rel": "alternate",
+     "type": "text/html",
+     "href": "https://music.apple.com/WebObjects/MZStore.woa/wa/viewGrouping?cc=gb&id=130"
+    }
+   },
+   {
+    "attributes": {
+     "rel": "self",
+     "href": "https://itunes.apple.com/gb/rss/customerreviews/id=1052238659/sortby=mostrecent/page=1/json"
+    }
+   },
+   {
+    "attributes": {
+     "rel": "first",
+     "href": "https://itunes.apple.com/gb/rss/customerreviews/page=1/id=1052238659/sortby=mostrecent/xml?urlDesc=/customerreviews/id=1052238659/sortby=mostrecent/page=1/json"
+    }
+   },
+   {
+    "attributes": {
+     "rel": "last",
+     "href": "https://itunes.apple.com/gb/rss/customerreviews/page=10/id=1052238659/sortby=mostrecent/xml?urlDesc=/customerreviews/id=1052238659/sortby=mostrecent/page=1/json"
+    }
+   },
+   {
+    "attributes": {
+     "rel": "previous",
+     "href": "https://itunes.apple.com/gb/rss/customerreviews/page=1/id=1052238659/sortby=mostrecent/xml?urlDesc=/customerreviews/id=1052238659/sortby=mostrecent/page=1/json"
+    }
+   },
+   {
+    "attributes": {
+     "rel": "next",
+     "href": "https://itunes.apple.com/gb/rss/customerreviews/page=2/id=1052238659/sortby=mostrecent/xml?urlDesc=/customerreviews/id=1052238659/sortby=mostrecent/page=1/json"
+    }
+   }
+  ],
+  "id": {
+   "label": "https://itunes.apple.com/gb/rss/customerreviews/id=1052238659/sortby=mostrecent/page=1/json"
+  }
+ }
+}

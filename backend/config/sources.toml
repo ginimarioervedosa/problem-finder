@@ -44,6 +44,27 @@ schedule = "0 7 * * 4"
 enabled = true
 schedule = "0 7 * * 4"
 
+# Official reviews feed, declared official_api by owner decision 2026-07-27
+# (robots status recorded DISALLOWED in the adapter's policy). The app list
+# is a starting proposal of UK finance apps high earners use; edit freely.
+[sources.app_store_reviews]
+enabled = true
+schedule = "30 8 * * *"
+
+[sources.app_store_reviews.options]
+country = "gb"
+
+[sources.app_store_reviews.options.apps]
+1052238659 = "Monzo"
+932493382 = "Revolut"
+956806430 = "Starling Bank"
+1517121245 = "Chase UK"
+450465506 = "Hargreaves Lansdown"
+434714838 = "interactive investor"
+1127250193 = "Nutmeg"
+1049797239 = "Moneybox"
+566325832 = "Trading 212"
+
 # Disabled until OAuth credentials exist in .env (PF_REDDIT_CLIENT_ID /
 # PF_REDDIT_CLIENT_SECRET). The subreddit list is a starting proposal; edit freely.
 [sources.reddit]
