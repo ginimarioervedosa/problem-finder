@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from problemfinder.api.app import create_app
 from problemfinder.api.dependencies import get_session
+from problemfinder.sources import registry
 from tests.support.builders import build_aggregate, build_verbatim
 from tests.support.seeding import seed_signals
 
@@ -49,7 +50,10 @@ def test_summaries_by_category(client: TestClient) -> None:
 
 def test_sources_lists_every_adapter_with_policy(client: TestClient) -> None:
     sources = {entry["key"]: entry for entry in client.get("/api/sources").json()}
-    assert set(sources) == {"fos_complaints", "fos_decisions", "reddit"}
+    # Every registered adapter and nothing else, so a new adapter package
+    # never needs an edit here.
+    assert set(sources) == set(registry.all_sources())
+    assert {"fos_complaints", "fos_decisions", "reddit"} <= set(sources)
     fos = sources["fos_complaints"]
     assert fos["enabled"] is True
     assert fos["policy"]["method"] == "bulk_download"

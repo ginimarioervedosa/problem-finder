@@ -14,9 +14,10 @@ import fastexcel
 import polars as pl
 from pydantic import JsonValue
 
-from problemfinder.sources.adapters.fos_complaints.cells import count, text
 from problemfinder.sources.adapters.fos_complaints.upheld import category_share, upheld_lookup
+from problemfinder.sources.cells import count, text
 from problemfinder.sources.protocol import ParsedRecord, RawDocument, SourceParseError
+from problemfinder.sources.slugs import slug
 
 _DATA_START_ROW = 2
 _CATEGORY_START_COL = 3
@@ -51,7 +52,7 @@ def parse_workbook(raw: RawDocument) -> Iterator[ParsedRecord]:
                 "period": period,
             }
             yield ParsedRecord(
-                external_id=f"{period}:{_slug(business)}:{_slug(category)}", fields=fields
+                external_id=f"{period}:{slug(business)}:{slug(category)}", fields=fields
             )
 
 
@@ -98,7 +99,3 @@ def _is_totals_or_footnote(business: str, group: str | None) -> bool:
     if lowered.startswith("*") or "total number of complaints" in lowered:
         return True
     return bool(_TOTALS_RE.match(business)) and group is None
-
-
-def _slug(value: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", value.lower()).strip("-")

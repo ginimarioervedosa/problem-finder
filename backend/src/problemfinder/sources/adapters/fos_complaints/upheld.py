@@ -8,7 +8,7 @@ produce the same lookup: business -> {category label -> share}.
 
 import re
 
-from problemfinder.sources.adapters.fos_complaints.cells import share, text
+from problemfinder.sources.cells import share, text
 
 _HEADER_SUFFIX = "% of cases upheld"
 type Rows = list[tuple[object, ...]]
