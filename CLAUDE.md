@@ -126,6 +126,24 @@ date window, Reddit subreddits) live in an `options` table in `sources.toml`, re
 only by the owning adapter. Reddit needs `PF_REDDIT_CLIENT_ID` and
 `PF_REDDIT_CLIENT_SECRET` in `.env` and stays disabled until they exist.
 
+## Codebase navigation
+
+Graphify builds a local call and import graph, which answers "what breaks if I change this"
+at two or more hops faster than a grep chain does. Doctrine, including why the `/graphify`
+skill and its global hook stay uninstalled, is in `~/.claude/rules/graphify.md`.
+
+```bash
+graphify extract . --code-only --out /tmp/graphify-problem-finder
+export G=/tmp/graphify-problem-finder/graphify-out/graph.json
+graphify affected "some_function()" --graph $G --depth 2   # reverse call and import graph
+graphify god-nodes --graph $G --top 15                     # architectural hubs
+```
+
+Always pass `--code-only`: it is local tree-sitter AST parsing with no API key and no
+network egress, and any run without it sends file contents to an LLM backend. Prefer
+`affected` and `god-nodes`; `graphify query` returns a flat, truncated node list and an
+Explore subagent answers the same question better.
+
 ## Behavioural Foundation
 
 1. **Don't assume. Surface tradeoffs.** Ambiguous request: ask. Hidden decision: name it.
